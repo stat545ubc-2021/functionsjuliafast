@@ -6,15 +6,13 @@ output: github_document
 ---
 
 
-- overall making a function that will compare the proportion of total zooplankton biomass made up by each zooplanton taxa in regions across the SOG
-
 ## Datset Background (Copied from Milestones 1 and 2)
 
 The *zooplankton_biomass* dataset used for this project was acquired courtesy of Fisheries and Oceans Canada (DFO). I will be using this dataset for my MSc research project. It contains zooplankton biomass data by major taxa collected from 1980 to 2018 at a variety of stations in the NE Pacific and Canadian Arctic oceanic regions. Samples were collected both during the day and at night using a variety of sampling net types (Government of Canada [date unknown]).
 
 # Install and Load Packages (Section taken from Milestone 2)
 
-**Install** *tidyverse* and *readr* packages if you have not already done so:
+**Install** `tidyverse`, `readr`, and `roxygen2` packages if you have not already done so:
 ```{r, message = FALSE}
 
 #install the tidyverse package:
@@ -23,21 +21,28 @@ The *zooplankton_biomass* dataset used for this project was acquired courtesy of
 #install the readr package:
 #install.packages("readr")
 
+#install the roxygen2 packages
+#install.packages("roxygen2")
+
 ```
 
-**Load** the *tidyverse* package and the *zooplankton dataset* being used for this project:
+**Load** the `tidyverse` and `roxygen2` packages, as well as the `zooplankton dataset` being used for this project:
 ```{r, message = FALSE}
 
 #load the tidyverse package
 #load the readr package (this package will allow the CSV file containing the project dataset to be read)
 library(readr) 
 library(tidyverse)
+library(roxygen2)
 
 #read the project dataset in RStudio, and save this dataset as a variable called "zooplankton_biomass"
 #the CSV file containing the project dataset is located in the Milestone2 folder of the project GitHub repository
 zooplankton_biomass <- read_csv('IOS_zooplankton_1980_2018_as_biomass_major_taxa_groups_EN.csv')
 
 ```
+
+
+- overall making a function that will compare the proportion of total zooplankton biomass made up by each zooplankton taxa pre and post HW
 
 I want to use a cleaned up version of the zooplankton_biomass dataset that I created for the Mini Data Analysis Milestone 3 assignment from the STAT545A class.
 ```{r}
@@ -99,6 +104,12 @@ any(is.na(zooplankton_funct))
 ```
 
 ```{r}
+#' @title Multiple Boxplot for a Numeric Variable across Categories 
+#' @description This function creates a multiple boxplot that shows the distribution of a numeric variable in different categories contained in a categorical variable
+#' @params data The dataframe that contains the variables that you would like to use to create the bozplot
+#' @params x The categorical variable that we want to plot a numerical variable across
+#' @params y The numeric variable that we want to examine the distribution of across a categorical variable 
+#' @return A boxplot showing the distribution of y in each category contained in x
 
 #create a function called "boxplot_zoop"
 boxplot_zoop <- function (data, x, y) {
@@ -117,10 +128,32 @@ boxplot_zoop <- function (data, x, y) {
           axis.title.x=element_blank())
 }
 
-boxplot_zoop(zooplankton_funct, `Time Period`, `Polychaeta Proportion of Total Biomass`)
+```
+
+Now let's test this function to see if it works by creating a boxplot that compares Copepod biomass pre and pst heat wave.
+```{r}
+
+boxplot_zoop(zooplankton_funct, `Time Period`, `Copepoda Proportion of Total Biomass`)
+
+
 ```
 
 # Exercise 2: Document your Function (20 points)
+
+In the same code chunk where you made your function, document the function using roxygen2 tags. Be sure to include:
+
+Title.
+Function description: In 1-2 brief sentences, describe what the function does.
+Document each argument with the @param tag, making sure to justify why you named the parameter as you did.
+(Justification for naming is not often needed, but we want to hear your reasoning.)
+What the function returns, using the @return tag.
+
+
+
+
+
+
+
 
 
 

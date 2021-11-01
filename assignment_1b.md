@@ -3,10 +3,6 @@ Assignment 1B
 Julia Fast
 01/11/2021
 
--   overall making a function that will compare the proportion of total
-    zooplankton biomass made up by each zooplanton taxa in regions
-    across the SOG
-
 ## Datset Background (Copied from Milestones 1 and 2)
 
 The *zooplankton_biomass* dataset used for this project was acquired
@@ -19,8 +15,8 @@ net types (Government of Canada \[date unknown\]).
 
 # Install and Load Packages (Section taken from Milestone 2)
 
-**Install** *tidyverse* and *readr* packages if you have not already
-done so:
+**Install** `tidyverse`, `readr`, and `roxygen2` packages if you have
+not already done so:
 
 ``` r
 #install the tidyverse package:
@@ -28,21 +24,28 @@ done so:
 
 #install the readr package:
 #install.packages("readr")
+
+#install the roxygen2 packages
+#install.packages("roxygen2")
 ```
 
-**Load** the *tidyverse* package and the *zooplankton dataset* being
-used for this project:
+**Load** the `tidyverse` and `roxygen2` packages, as well as the
+`zooplankton dataset` being used for this project:
 
 ``` r
 #load the tidyverse package
 #load the readr package (this package will allow the CSV file containing the project dataset to be read)
 library(readr) 
 library(tidyverse)
+library(roxygen2)
 
 #read the project dataset in RStudio, and save this dataset as a variable called "zooplankton_biomass"
 #the CSV file containing the project dataset is located in the Milestone2 folder of the project GitHub repository
 zooplankton_biomass <- read_csv('IOS_zooplankton_1980_2018_as_biomass_major_taxa_groups_EN.csv')
 ```
+
+-   overall making a function that will compare the proportion of total
+    zooplankton biomass made up by each zooplankton taxa pre and post HW
 
 I want to use a cleaned up version of the zooplankton_biomass dataset
 that I created for the Mini Data Analysis Milestone 3 assignment from
@@ -151,6 +154,12 @@ any(is.na(zooplankton_funct))
     ## [1] FALSE
 
 ``` r
+' @title Boxplot '
+```
+
+    ## [1] " @title Boxplot "
+
+``` r
 #create a function called "boxplot_zoop"
 boxplot_zoop <- function (data, x, y) {
     ggplot(data, aes({{ x }}, {{ y }})) + 
@@ -167,13 +176,27 @@ boxplot_zoop <- function (data, x, y) {
           axis.ticks.x=element_blank(),
           axis.title.x=element_blank())
 }
-
-boxplot_zoop(zooplankton_funct, `Time Period`, `Polychaeta Proportion of Total Biomass`)
 ```
 
-![](assignment_1b_files/figure-gfm/unnamed-chunk-6-1.png)<!-- -->
+Now let’s test this function to see if it works by creating a boxplot
+that compares Copepod biomass pre and pst heat wave.
+
+``` r
+boxplot_zoop(zooplankton_funct, `Time Period`, `Copepoda Proportion of Total Biomass`)
+```
+
+![](assignment_1b_files/figure-gfm/unnamed-chunk-7-1.png)<!-- -->
 
 # Exercise 2: Document your Function (20 points)
+
+In the same code chunk where you made your function, document the
+function using roxygen2 tags. Be sure to include:
+
+Title. Function description: In 1-2 brief sentences, describe what the
+function does. Document each argument with the @param tag, making sure
+to justify why you named the parameter as you did. (Justification for
+naming is not often needed, but we want to hear your reasoning.) What
+the function returns, using the @return tag.
 
 Before getting started, let’s also modify the region_name column in the
 zooplankton_biomass_mi3 (cleaned) dataset and convert this variable from
