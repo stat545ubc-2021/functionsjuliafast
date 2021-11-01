@@ -4,3 +4,204 @@ author: "Julia Fast"
 date: "01/11/2021"
 output: github_document
 ---
+
+
+## Datset Background (Copied from Milestones 1 and 2)
+
+The *zooplankton_biomass* dataset used for this project was acquired courtesy of Fisheries and Oceans Canada (DFO). I will be using this dataset for my MSc research project. It contains zooplankton biomass data by major taxa collected from 1980 to 2018 at a variety of stations in the NE Pacific and Canadian Arctic oceanic regions. Samples were collected both during the day and at night using a variety of sampling net types (Government of Canada [date unknown]).
+
+# Install and Load Packages (Section taken from Milestone 2)
+
+**Install** `tidyverse`, `readr`, `roxygen2`, and `testthat` packages if you have not already done so:
+```{r, message = FALSE}
+
+#install the tidyverse package:
+#install.packages("tidyverse")
+
+#install the readr package:
+#install.packages("readr")
+
+#install the roxygen2 package:
+#install.packages("roxygen2")
+
+#install the testthat package:
+#install.packages("testthat")
+
+```
+
+**Load** the `tidyverse`, `testthat`, and `roxygen2` packages, as well as the `zooplankton dataset` being used for this project:
+```{r, message = FALSE}
+
+#load the tidyverse package
+#load the readr package (this package will allow the CSV file containing the project dataset to be read)
+library(readr) 
+library(tidyverse)
+library(testthat)
+library(roxygen2)
+
+#read the project dataset in RStudio, and save this dataset as a variable called "zooplankton_biomass"
+#the CSV file containing the project dataset is located in the Milestone2 folder of the project GitHub repository
+zooplankton_biomass <- read_csv('IOS_zooplankton_1980_2018_as_biomass_major_taxa_groups_EN.csv')
+
+```
+
+
+- overall making a function that will compare the proportion of total zooplankton biomass made up by each zooplankton taxa pre and post HW
+
+I want to use a cleaned up version of the zooplankton_biomass dataset that I created for the Mini Data Analysis Milestone 3 assignment from the STAT545A class.
+```{r}
+#create a subset of the zooplankton_biomass dataset called "zooplankton_biomass_cleaned"
+zooplankton_biomass_cleaned <- zooplankton_biomass %>% 
+  #remove the columns from 'Station' to 'latitude' and from 'time' to 'CTD' from the dataset
+  select(-c(Station:latitude, time:CTD)) %>% 
+  #separate the date column into three columns of year, month, and day
+  #the below line of code is from joels 2018
+  separate(date, sep="-", into = c("year", "month", "day")) %>% 
+  #remove newly created month and day columns from the dataset
+  select(-c(month, day)) %>% 
+  #create a new variable called "time_period" that groups each year as either pre or post marine heat wave
+  mutate(time_period = case_when(year < 2014 ~ "Pre Heat Wave",
+                                TRUE ~ "Post Heat Wave")) %>% 
+  #arrange region_name to be in alphabetical order and year to be in ascending order
+  arrange(across(region_name:year)) %>% 
+  #arrange the columns so that the time_period column comes after the year column
+  select(c(region_name, year, time_period, everything()))
+
+#view the cleaned up dataset
+print(zooplankton_biomass_cleaned)
+```
+
+
+
+```{r}
+#create a new dataset called "zooplankton_funct" from the cleaned version of the original dataset
+zooplankton_funct <- zooplankton_biomass_cleaned %>% 
+  #create a new column (variable) called "total_biomass" that sums all zooplankton taxa biomass values in each row
+  mutate("total_biomass" = rowSums(across(where(is.numeric)))) %>%
+  #divide the zooplankton biomass values by the total biomass in that sample so that these cells contain the proportion of total biomass the zooplankton taxa makes up in each sample
+  #below line of code adapted from Cetinkaya-Rundel et al. 2020
+  mutate(across(where(is.numeric), ~./total_biomass)) %>% 
+  #remove the total biomass column
+  select(-total_biomass) %>% 
+  rename("Time Period" = time_period) %>% 
+  # below code adapted from https://stackoverflow.com/questions/64188671/renaming-multiple-columns-with-dplyr-renameacross
+  rename_with(~str_c(., " Proportion of Total Biomass"), Polychaeta:Animalia)
+  
+
+
+#view the new dataset
+print(zooplankton_funct)
+
+```
+# Exercise 1: Make a Function (25 points)
+
+In this exercise, you’ll be making a function and fortifying it. The function need not be complicated. The function need not be “serious”, but shouldn’t be nonsense.
+
+I want to create a function that compares the proportion of total biomass made up by one of the zooplankton taxa pre and post heat wave. I will make this function general so that it can be used to compare any numeric variable in each category of any categorical variable. 
+
+
+- named variable x and y because of what axis, the categorical variable names would be on x axis and numeric variables on y axis
+- people are used to an x and y variable when creating plots
+
+```{r}
+#' @title Multiple Boxplot for a Numeric Variable across Categories 
+#' @description This function creates a multiple boxplot that shows the distribution of a numeric variable in different categories contained in a categorical variable. NA values will automatically be removed from the data, which will lead to the warning message "Removed n rows containing non-finite values (stat_boxplot)" with n being the number of NA rows removed.
+#' @params dataframe The dataframe that contains the variables that you would like to use to create the boxplot
+#' @params x The categorical variable that we want to plot a numerical variable across.
+#' @params y The numeric variable that we want to examine the distribution of across a categorical variable
+#' @return A boxplot showing the distribution of y in each category contained in x
+#' 
+#' Creates a boxplot using the "CO2" dataset from the r "datasets" package that shows the distribution of CO2 concentration of grass plants in each treatment type (chilled or nonchilled):
+#' @examples boxplot_numeric_category(CO2, Treatment, conc)
+#' Creates a boxplot using the dplyr "starwars" dataset that shows the distribution of the height of starwars characters based on the sex of the characters:
+#' @examples starwars %>% boxplot_numeric_category(sex, height)
+#' Creates a boxplot using the dplyr "storms" dataset that shows the distribution of the wind speeds observed for the storms Caroline and Doris:
+#' @examples boxplot_numeric_category((storms %>% filter(name == c("Amy", "Doris"))), name, wind)
+
+#create a function called "boxplot_numeric_category"
+boxplot_numeric_category <- function (dataframe, x, y) {
+  
+  ggplot(dataframe, aes({{ x }}, {{ y }})) + 
+  #specify a box plot, set the width of the boxes, and specify the transparency of the box plot
+  geom_boxplot(aes(fill= {{ x }})) + 
+    #change the theme of the plot
+    theme_linedraw() +
+    #remove the x axis ticks and labels
+    #below line of code from Elferts 2016
+    theme(axis.text.x=element_blank(),
+          axis.ticks.x=element_blank(),
+          axis.title.x=element_blank())
+}
+
+# remove na https://stackoverflow.com/questions/17216358/eliminating-nas-from-a-ggplot
+
+```
+
+Now let's test this function to see if it works by creating a boxplot that compares Copepod biomass pre and pst heat wave.
+```{r}
+
+boxplot_cop_biomass <- boxplot_numeric_category(zooplankton_funct, `Time Period`, `Copepoda Proportion of Total Biomass`)
+
+print(boxplot_cop_biomass)
+
+```
+
+- expect equal two boxplots
+- expect error if one is not numeric
+- expect error if one is not variABLE
+- expect class is a boxplot
+
+
+
+```{r}
+
+
+```
+
+
+
+# Exercise 2: Document your Function (20 points)
+
+In the same code chunk where you made your function, document the function using roxygen2 tags. Be sure to include:
+
+Title.
+Function description: In 1-2 brief sentences, describe what the function does.
+Document each argument with the @param tag, making sure to justify why you named the parameter as you did.
+(Justification for naming is not often needed, but we want to hear your reasoning.)
+What the function returns, using the @return tag.
+
+
+
+
+
+
+
+
+
+
+
+Before getting started, let's also modify the region_name column in the zooplankton_biomass_mi3 (cleaned) dataset and convert this variable from a character object to a factor.
+```{r}
+
+
+#convert the region_name variable from a character object to a factor
+#below line of code from Schork [date unknown]
+#zooplankton_biomass_mi3$region_name <- as.factor(zooplankton_biomass_mi3$region_name)
+
+```
+
+
+
+
+
+params na.rm This command can be set equal to (=) TRUE to remove NA values or FALSE to leave NA values in.
+
+
+below line of code from https://stackoverflow.com/questions/49943092/how-to-set-ggplot-x-label-equal-to-variable-name-during-lapply
+  
+  get_name <- deparse(substitute(y))
+
+xlab(label= get_name)
+
+possible sources   
+https://subscription.packtpub.com/book/big_data_and_business_intelligence/9781783554553/1/ch01lvl1sec12/passing-parameter-values-to-titles-and-labels
