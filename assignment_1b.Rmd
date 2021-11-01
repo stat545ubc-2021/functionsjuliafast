@@ -4,3 +4,22 @@ author: "Julia Fast"
 date: "01/11/2021"
 output: github_document
 ---
+
+# Exercise 1: Make a Function (25 points)
+
+In this exercise, you’ll be making a function and fortifying it. The function need not be complicated. The function need not be “serious”, but shouldn’t be nonsense.
+
+Function Ideas
+
+- making boxplot to compare different species 
+
+
+Did you repeat any code for a data analysis in STAT 545A? If so, consider making a function for this action.
+Consider bundling a specific group_by() %>% summarise() workflow.
+Write a wrapper around an existing function.
+For example, perhaps accepting a narrower range of inputs (like not allowing logical vectors), or providing a different output.
+A specific example: my rqdist() function is a wrapper around quantreg::rq(), narrowing its functionality.
+It’s usually better to narrow a function’s focus than to broaden, so that a function doesn’t end up doing too much.
+Make a function extracting parts of an "lm" object that you can’t easily access (broom aside), or measuring the “difference” between a linear and quadratic fit.
+Make a special plot that you’d want to repeat when exploring your data.
+…
