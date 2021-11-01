@@ -142,7 +142,9 @@ function need not be complicated. The function need not be “serious”,
 but shouldn’t be nonsense.
 
 I want to create a function that compares the proportion of total
-biomass made up by one of the zooplankton taxa pre and post heat wave.
+biomass made up by one of the zooplankton taxa pre and post heat wave. I
+will make this function general so that it can be used to compare any
+numeric variable in each category of any categorical variable.
 
 No NAs in data.
 
@@ -153,23 +155,28 @@ any(is.na(zooplankton_funct))
 
     ## [1] FALSE
 
-``` r
-' @title Boxplot '
-```
-
-    ## [1] " @title Boxplot "
+-   named variable x and y because of what axis, the categorical
+    variable names would be on x axis and numeric variables on y axis
+-   people are used to an x and y variable when creating plots
 
 ``` r
-#create a function called "boxplot_zoop"
-boxplot_zoop <- function (data, x, y) {
-    ggplot(data, aes({{ x }}, {{ y }})) + 
+#' @title Multiple Boxplot for a Numeric Variable across Categories 
+#' @description This function creates a multiple boxplot that shows the distribution of a numeric variable in different categories contained in a categorical variable
+#' @params dataframe The dataframe that contains the variables that you would like to use to create the boxplot
+#' @params x The categorical variable that we want to plot a numerical variable across.
+#' @params y The numeric variable that we want to examine the distribution of across a categorical variable
+#' @return A boxplot showing the distribution of y in each category contained in x
+#' @examples starwars %>% boxplot_numeric_category(species, height, na.rm = TRUE)
+#' 
+#'
+
+#create a function called "boxplot_numeric_category"
+boxplot_numeric_category <- function (dataframe, x, y) {
+    ggplot(dataframe, aes({{ x }}, {{ y }})) + 
   #specify a box plot, set the width of the boxes, and specify the transparency of the box plot
   geom_boxplot(aes(fill= {{ x }})) + 
     #change the theme of the plot
     theme_linedraw() +
-    #change the colours of each box
-    #the below line of code is from STHDA [date unknown]
-    scale_fill_manual(values=c("lightsteelblue1", "aquamarine1", "lightsalmon1")) +
     #remove the x axis ticks and labels
     #below line of code from Elferts 2016
     theme(axis.text.x=element_blank(),
@@ -182,7 +189,7 @@ Now let’s test this function to see if it works by creating a boxplot
 that compares Copepod biomass pre and pst heat wave.
 
 ``` r
-boxplot_zoop(zooplankton_funct, `Time Period`, `Copepoda Proportion of Total Biomass`)
+boxplot_numeric_category(zooplankton_funct, `Time Period`, `Copepoda Proportion of Total Biomass`)
 ```
 
 ![](assignment_1b_files/figure-gfm/unnamed-chunk-7-1.png)<!-- -->
@@ -207,6 +214,9 @@ a character object to a factor.
 #below line of code from Schork [date unknown]
 #zooplankton_biomass_mi3$region_name <- as.factor(zooplankton_biomass_mi3$region_name)
 ```
+
+params na.rm This command can be set equal to (=) TRUE to remove NA
+values or FALSE to leave NA values in.
 
 below line of code from
 <https://stackoverflow.com/questions/49943092/how-to-set-ggplot-x-label-equal-to-variable-name-during-lapply>
