@@ -1,0 +1,6 @@
+---
+title: "Assignment 1B"
+author: "Julia Fast"
+date: "01/11/2021"
+output: github_document
+---
