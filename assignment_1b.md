@@ -15,8 +15,8 @@ net types (Government of Canada \[date unknown\]).
 
 # Install and Load Packages (Section taken from Milestone 2)
 
-**Install** `tidyverse`, `readr`, and `roxygen2` packages if you have
-not already done so:
+**Install** `tidyverse`, `readr`, `roxygen2`, and `testthat` packages if
+you have not already done so:
 
 ``` r
 #install the tidyverse package:
@@ -25,18 +25,22 @@ not already done so:
 #install the readr package:
 #install.packages("readr")
 
-#install the roxygen2 packages
+#install the roxygen2 package:
 #install.packages("roxygen2")
+
+#install the testthat package:
+#install.packages("testthat")
 ```
 
-**Load** the `tidyverse` and `roxygen2` packages, as well as the
-`zooplankton dataset` being used for this project:
+**Load** the `tidyverse`, `testthat`, and `roxygen2` packages, as well
+as the `zooplankton dataset` being used for this project:
 
 ``` r
 #load the tidyverse package
 #load the readr package (this package will allow the CSV file containing the project dataset to be read)
 library(readr) 
 library(tidyverse)
+library(testthat)
 library(roxygen2)
 
 #read the project dataset in RStudio, and save this dataset as a variable called "zooplankton_biomass"
@@ -146,33 +150,29 @@ biomass made up by one of the zooplankton taxa pre and post heat wave. I
 will make this function general so that it can be used to compare any
 numeric variable in each category of any categorical variable.
 
-No NAs in data.
-
-``` r
-#https://discuss.analyticsvidhya.com/t/how-can-i-check-whether-my-data-frame-contains-na-inf-values-in-some-column-or-not-in-r/1647
-any(is.na(zooplankton_funct))
-```
-
-    ## [1] FALSE
-
 -   named variable x and y because of what axis, the categorical
     variable names would be on x axis and numeric variables on y axis
 -   people are used to an x and y variable when creating plots
 
 ``` r
 #' @title Multiple Boxplot for a Numeric Variable across Categories 
-#' @description This function creates a multiple boxplot that shows the distribution of a numeric variable in different categories contained in a categorical variable
+#' @description This function creates a multiple boxplot that shows the distribution of a numeric variable in different categories contained in a categorical variable. NA values will automatically be removed from the data, which will lead to the warning message "Removed n rows containing non-finite values (stat_boxplot)" with n being the number of NA rows removed.
 #' @params dataframe The dataframe that contains the variables that you would like to use to create the boxplot
 #' @params x The categorical variable that we want to plot a numerical variable across.
 #' @params y The numeric variable that we want to examine the distribution of across a categorical variable
 #' @return A boxplot showing the distribution of y in each category contained in x
-#' @examples starwars %>% boxplot_numeric_category(species, height, na.rm = TRUE)
 #' 
-#'
+#' Creates a boxplot using the "CO2" dataset from the r "datasets" package that shows the distribution of CO2 concentration of grass plants in each treatment type (chilled or nonchilled):
+#' @examples boxplot_numeric_category(CO2, Treatment, conc)
+#' Creates a boxplot using the dplyr "starwars" dataset that shows the distribution of the height of starwars characters based on the sex of the characters:
+#' @examples starwars %>% boxplot_numeric_category(sex, height)
+#' Creates a boxplot using the dplyr "storms" dataset that shows the distribution of the wind speeds observed for the storms Caroline and Doris:
+#' @examples boxplot_numeric_category((storms %>% filter(name == c("Amy", "Doris"))), name, wind)
 
 #create a function called "boxplot_numeric_category"
 boxplot_numeric_category <- function (dataframe, x, y) {
-    ggplot(dataframe, aes({{ x }}, {{ y }})) + 
+  
+  ggplot(dataframe, aes({{ x }}, {{ y }})) + 
   #specify a box plot, set the width of the boxes, and specify the transparency of the box plot
   geom_boxplot(aes(fill= {{ x }})) + 
     #change the theme of the plot
@@ -183,16 +183,25 @@ boxplot_numeric_category <- function (dataframe, x, y) {
           axis.ticks.x=element_blank(),
           axis.title.x=element_blank())
 }
+
+# remove na https://stackoverflow.com/questions/17216358/eliminating-nas-from-a-ggplot
 ```
 
 Now let’s test this function to see if it works by creating a boxplot
 that compares Copepod biomass pre and pst heat wave.
 
 ``` r
-boxplot_numeric_category(zooplankton_funct, `Time Period`, `Copepoda Proportion of Total Biomass`)
+boxplot_cop_biomass <- boxplot_numeric_category(zooplankton_funct, `Time Period`, `Copepoda Proportion of Total Biomass`)
+
+print(boxplot_cop_biomass)
 ```
 
-![](assignment_1b_files/figure-gfm/unnamed-chunk-7-1.png)<!-- -->
+![](assignment_1b_files/figure-gfm/unnamed-chunk-6-1.png)<!-- -->
+
+-   expect equal two boxplots
+-   expect error if one is not numeric
+-   expect error if one is not variABLE
+-   expect class is a boxplot
 
 # Exercise 2: Document your Function (20 points)
 

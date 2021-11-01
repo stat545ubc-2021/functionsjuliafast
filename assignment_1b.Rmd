@@ -155,7 +155,6 @@ print(boxplot_cop_biomass)
 
 ```{r}
 
-expect_equal()
 
 ```
 
