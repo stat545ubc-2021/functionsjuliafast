@@ -5,11 +5,189 @@ date: "01/11/2021"
 output: github_document
 ---
 
+
+- overall making a function that will compare the proportion of total zooplankton biomass made up by each zooplanton taxa in regions across the SOG
+
 # Exercise 1: Make a Function (25 points)
 
 In this exercise, you’ll be making a function and fortifying it. The function need not be complicated. The function need not be “serious”, but shouldn’t be nonsense.
 
+## Datset Background (Copied from Milestones 1 and 2)
+
+The *zooplankton_biomass* dataset used for this project was acquired courtesy of Fisheries and Oceans Canada (DFO). I will be using this dataset for my MSc research project. It contains zooplankton biomass data by major taxa collected from 1980 to 2018 at a variety of stations in the NE Pacific and Canadian Arctic oceanic regions. Samples were collected both during the day and at night using a variety of sampling net types (Government of Canada [date unknown]).
+
+# Install and Load Packages (Section taken from Milestone 2)
+
+**Install** *tidyverse* and *readr* packages if you have not already done so:
+```{r, message = FALSE}
+
+#install the tidyverse package:
+#install.packages("tidyverse")
+
+#install the readr package:
+#install.packages("readr")
+
+```
+
+**Load** the *tidyverse* package and the *zooplankton dataset* being used for this project:
+```{r, message = FALSE}
+
+#load the tidyverse package
+#load the readr package (this package will allow the CSV file containing the project dataset to be read)
+library(readr) 
+library(tidyverse)
+library(lubridate)
+
+#read the project dataset in RStudio, and save this dataset as a variable called "zooplankton_biomass"
+#the CSV file containing the project dataset is located in the Milestone2 folder of the project GitHub repository
+zooplankton_biomass <- read_csv('IOS_zooplankton_1980_2018_as_biomass_major_taxa_groups_EN.csv')
+
+```
+
+For this milestone, we will mainly be using the cleaned up version of the data from Milestone 2:
+```{r}
+#create a subset of the zooplankton_biomass dataset called "zooplankton_biomass_mi3"
+zooplankton_biomass_mi3 <- zooplankton_biomass %>% 
+  #remove the columns from 'Station' to 'latitude' and from 'time' to 'CTD' from the dataset
+  select(-c(Station:latitude, time:CTD)) %>% 
+  #separate the date column into three columns of year, month, and day
+  #the below line of code is from joels 2018
+  separate(date, sep="-", into = c("year", "month", "day")) %>% 
+  #remove newly created month and day columns from the dataset
+  select(-c(month, day)) %>% 
+  #create a new variable called "time_period" that groups each year as either pre or post marine heat wave
+  mutate(time_period = case_when(year < 2014 ~ "Pre Heat Wave",
+                                TRUE ~ "Post Heat Wave")) %>% 
+  #arrange region_name to be in alphabetical order and year to be in ascending order
+  arrange(across(region_name:year)) %>% 
+  #arrange the columns so that the time_period column comes after the year column
+  select(c(region_name, year, time_period, everything()))
+
+#view the cleaned up dataset ready for further analysis in milestone 3
+print(zooplankton_biomass_mi3)
+```
+
+*Below Text and Code from Milestone 3*
+
+I want to create a box plot showing the proportion of total zooplankton biomass made up by a main zooplankton prey group for Pacific salmon and herring. Main zooplankton prey groups tend to be larger zooplankton (Brian Hunt, Personal Communication, 2021). I have selected a taxa that is not microzooplankton, Copepoda, for this plot (Hobday et al. 2006). Copepods have been known to be an important prey group for Pacific fish species and other marine organisms (Jackson & Lenz 2016). I want to compare the proportion of total biomass that this taxa makes up across oceanic regions near Vancouver Island.
+
+First, let's modify the region_name column in the zooplankton_biomass_mi3 (cleaned) dataset and convert this variable from a character object to a factor.
+```{r}
+
+#let's confirm the class of the region_name variable in the zooplankton_biomass_mi3 dataset
+class(zooplankton_biomass_mi3$region_name)
+
+#convert the region_name variable from a character object to a factor
+#below line of code from Schork [date unknown]
+zooplankton_biomass_mi3$region_name <- as.factor(zooplankton_biomass_mi3$region_name)
+
+#confirm that the region_name variable is now a factor class
+class(zooplankton_biomass_mi3$region_name)
+```
+
+
+```{r}
+#create a new dataset called "zooplankton_biomass_forfunc" from the cleaned version of the original dataset
+zooplankton_funct <- zooplankton_biomass_mi3 %>% 
+  #create a new column (variable) called "total_biomass" that sums all zooplankton taxa biomass values in each row
+  mutate("total_biomass" = rowSums(across(where(is.numeric)))) %>%
+  #divide the zooplankton biomass values by the total biomass in that sample so that these cells contain the proportion of total biomass the zooplankton taxa makes up in each sample
+  #below line of code adapted from Cetinkaya-Rundel et al. 2020
+  mutate(across(where(is.numeric), ~./total_biomass)) %>% 
+  #remove the total biomass column
+  select(-total_biomass) %>% 
+  #filter the data to only contain rows with a region_name containing "Strait of Georgia"
+  filter(str_detect(region_name, "Strait of Georgia")) %>% 
+  #remove unused levels
+  droplevels()
+  
+#view the new dataset
+print(zooplankton_funct)
+
+```
+
+Now I want to create a function that plots a zooplankton taxat species against each other to compare the proportion of each in total biomass in the Strait of Georgia.
+
+
+```{r}
+
+#create a function called "boxplot_zoop"
+boxplot_zoop <- function (data, x, y) {
+  #below line of code from https://stackoverflow.com/questions/49943092/how-to-set-ggplot-x-label-equal-to-variable-name-during-lapply
+  get_name <- deparse(substitute(y))
+  return(
+    ggplot(data, aes({{ x }}, {{ y }})) + 
+  #specify a box plot, set the width of the boxes, and specify the transparency of the box plot
+  geom_boxplot(aes(fill= {{ x }})) + 
+    #change the legend label
+    #the below line of code is adapted from Alboukadel 2018
+    labs(fill = "Region") +
+    #change the theme of the plot
+    theme_linedraw() +
+    #change the x and y axis titles
+    ylab(label = "Proportion of Total Biomass") +
+    xlab(label= get_name) +
+    #change the colours of each box
+    #the below line of code is from STHDA [date unknown]
+    scale_fill_manual(values=c("lightsteelblue1", "aquamarine1", "lightsalmon1")) +
+    #remove the x axis ticks and labels
+    #below line of code from Elferts 2016
+    theme(axis.text.x=element_blank(),
+          axis.ticks.x=element_blank()) )
+    
+}
+
+boxplot_zoop(zoop_funct, region_name, Copepoda)
+```
+
+  
+```{r}
+  +
+  #change the x and y axis titles
+  xlab(label = {{ x }}) +
+  ylab(label = "Proportion of Total Biomass") +
+  #change the legend label
+  #the below line of code is adapted from Alboukadel 2018
+  labs(fill = "Region") +
+  #change the theme of the plot
+  theme_linedraw() +
+  #remove the x axis ticks and labels
+  #below line of code from Elferts 2016
+  theme(axis.text.x=element_blank(),
+        axis.ticks.x=element_blank())
+}
+
+
+boxplot_zoop(zooplankton_biomass_forfunc, region_name, Copepoda)
+
+```
+
+
+
+```{r}
+
+#using the new dataset we just created,
+prop_biomass_cop %>%
+  #create a plot with the region name on the x axis and the proportion of total biomass made up by Copepods on the y axis
+  ggplot(aes(region_name, Copepoda)) + 
+  #specify a box plot, set the width of the boxes, and specify the transparency of the box plot
+  geom_boxplot(aes(fill=region_name), width = 0.75, alpha = 0.7) +
+  #change the x and y axis titles
+  xlab(label = Copepoda) +
+  ylab(label = "Proportion of Total Biomass") +
+  #change the legend label
+  #the below line of code is adapted from Alboukadel 2018
+  labs(fill = "Region") +
+  #change the theme of the plot
+  theme_linedraw() +
+  #remove the x axis ticks and labels
+  #below line of code from Elferts 2016
+  theme(axis.text.x=element_blank(),
+        axis.ticks.x=element_blank()) 
+
+```
 Function Ideas
+
 
 - making boxplot to compare different species 
 
@@ -23,3 +201,10 @@ It’s usually better to narrow a function’s focus than to broaden, so that a 
 Make a function extracting parts of an "lm" object that you can’t easily access (broom aside), or measuring the “difference” between a linear and quadratic fit.
 Make a special plot that you’d want to repeat when exploring your data.
 …
+
+
+
+
+
+possible sources   
+https://subscription.packtpub.com/book/big_data_and_business_intelligence/9781783554553/1/ch01lvl1sec12/passing-parameter-values-to-titles-and-labels
