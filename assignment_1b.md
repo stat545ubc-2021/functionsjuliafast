@@ -4,11 +4,11 @@ Julia Fast
 01/11/2021
 
 *Note that some code and text below will overlap with code and text from
-the STAT545A Mini Data Analysis*
+the STAT545A Mini Data Analysis (MDA)*
 
 ## Datset Background
 
-*(Section Copied from STAT545A Mini Data Analysis Project)*
+*(Section Copied from STAT545A MDA Project)*
 
 The *zooplankton_biomass* dataset used for this assignment was acquired
 courtesy of Fisheries and Oceans Canada (DFO). I will be using this
@@ -58,7 +58,8 @@ zooplankton_biomass <- read_csv('IOS_zooplankton_1980_2018_as_biomass_major_taxa
 For this assignment, I’d like to use the function I will create to
 answer questions pertaining to the zooplankton_biomass dataset from DFO.
 I will use a cleaned up version of that I created for the Mini Data
-Analysis Milestone 3 assignment from the STAT545A class.
+Analysis Milestone 3 assignment from the STAT545A class (below code from
+STAT545A MDA Milestones 2-3).
 
 ``` r
 #create a subset of the zooplankton_biomass dataset called "zooplankton_biomass_cleaned"
@@ -104,7 +105,7 @@ print(zooplankton_biomass_cleaned)
     ## #   Pteropoda <dbl>, Nemertea <dbl>, Phoronida <dbl>, Pisces <dbl>, …
 
 I want to further modify this cleaned dataset to work best with the
-function I plan to create:
+function I plan to create (code modified from STAT545A MDA Milestone 3):
 
 ``` r
 #create a new dataset called "zooplankton_funct" from the cleaned version of the original dataset
@@ -116,12 +117,12 @@ zooplankton_funct <- zooplankton_biomass_cleaned %>%
   mutate(across(where(is.numeric), ~./total_biomass)) %>% 
   #remove the total biomass column
   select(-total_biomass) %>% 
+  #rename the time_period column to "Time Period"
   rename("Time Period" = time_period) %>% 
+  #rename each zooplanlton taxa column to the taxa name followed by "Proportion of Total Biomass"
   # below code adapted from https://stackoverflow.com/questions/64188671/renaming-multiple-columns-with-dplyr-renameacross
   rename_with(~str_c(., " Proportion of Total Biomass"), Polychaeta:Animalia)
   
-
-
 #view the new dataset
 print(zooplankton_funct)
 ```
@@ -175,15 +176,15 @@ calculations_y <- summarise(dataframe, is.numeric = is.numeric({{y}}) | is.doubl
   
   
   if(!is.data.frame(dataframe)) {
-    stop('You have entered an input that is not a dataframe. Please use a dataframe for the dataframe input')
+    stop('You have entered an input that is not a dataframe. Please use a dataframe for the dataframe input. Class type of the variable you entered is: ', class(dataframe))
     }
 
   if(!calculations_x$is.character) {
-    stop('You have entered a non-character or non-factor input. Please enter a character or factor variable for the x input', class(calculations_x$class))
+    stop('You have entered a non-character or non-factor input. Please enter a character or factor variable for the x input. Class type of the variable you entered is: ', class(calculations_x$class))
   }
   
   if(!calculations_y$is.numeric) {
-    stop('You have entered a non-numeric, non-integer, or non-double input. Please enter a variable of a numeric, integer, or double class for the y input', class(calculations_y$class))
+    stop('You have entered a non-numeric, non-integer, or non-double input. Please enter a variable of a numeric, integer, or double class for the y input. Class type of the variable you entered is: ', class(calculations_y$class))
   }
   
 
@@ -225,7 +226,7 @@ starwars %>% boxplot_numeric_category(sex, height)
 starwars %>% boxplot_numeric_category(sex, name)
 ```
 
-    ## Error in boxplot_numeric_category(., sex, name): You have entered a non-numeric, non-integer, or non-double input. Please enter a variable of a numeric, integer, or double class for the y inputcharacter
+    ## Error in boxplot_numeric_category(., sex, name): You have entered a non-numeric, non-integer, or non-double input. Please enter a variable of a numeric, integer, or double class for the y input. Class type of the variable you entered is: character
 
 ``` r
 #create a boxplot using the dplyr "storms" dataset that shows the distribution of the wind speeds observed for the storms Caroline and Doris
@@ -257,12 +258,12 @@ did not have all correct variable types gave an error message:
 test_that("Testing if Examples for Boxplot Function Work or Do Not Work as Expected", {
   expect_silent(boxplot_numeric_category(CO2, Treatment, conc))
   expect_silent(starwars %>% boxplot_numeric_category(sex, height))
-  expect_error(boxplot_numeric_category(starwars, sex, name), "You have entered a non-numeric, non-integer, or non-double input. Please enter a variable of a numeric, integer, or double class for the y input")
+  expect_error(boxplot_numeric_category(starwars, sex, name), "You have entered a non-numeric, non-integer, or non-double input. Please enter a variable of a numeric, integer, or double class for the y input. Class type of the variable you entered is: ")
   expect_silent(boxplot_numeric_category((storms %>% filter(name == c("Amy", "Doris"))), name, wind))
 })
 ```
 
-    ## Test passed 😀
+    ## Test passed 🥳
 
 Let’s test now to see if each of the examples that use the correct
 variable types in the boxplot function output a ggplot (this is what we
@@ -276,7 +277,7 @@ test_that("Output Class Type of Boxplot Function Examples is ggplot", {
   })
 ```
 
-    ## Test passed 🌈
+    ## Test passed 🎉
 
 ``` r
 #' @examples 
