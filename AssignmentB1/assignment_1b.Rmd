@@ -72,6 +72,7 @@ zooplankton_biomass_cleaned <- zooplankton_biomass %>%
 #view the cleaned up dataset
 print(zooplankton_biomass_cleaned)
 ```
+
 I want to further modify this cleaned dataset to work best with the function I plan to create (code modified from STAT545A MDA Milestone 3):
 ```{r}
 #create a new dataset called "zooplankton_funct" from the cleaned version of the original dataset
@@ -86,7 +87,7 @@ zooplankton_funct <- zooplankton_biomass_cleaned %>%
   #rename the time_period column to "Time Period"
   rename("Time Period" = time_period) %>% 
   #rename each zooplanlton taxa column to the taxa name followed by "Proportion of Total Biomass"
-  # below code adapted from https://stackoverflow.com/questions/64188671/renaming-multiple-columns-with-dplyr-renameacross
+  # below line of code adapted from akrun 2020 
   rename_with(~str_c(., " Proportion of Total Biomass"), Polychaeta:Animalia)
   
 #view the new dataset
@@ -136,12 +137,6 @@ calculations_y <- summarise(dataframe, is.numeric = is.numeric({{ y }}) | is.dou
           axis.ticks.x=element_blank(),
           axis.title.x=element_blank())
 }
-
-# drop na https://community.rstudio.com/t/removing-na-from-used-column-in-ggplot/76579
-# remove na https://stackoverflow.com/questions/17216358/eliminating-nas-from-a-ggplot
-
-# idea to include dataframe from Kea, Yulia directed me to her code
-
 
 ```
 
@@ -216,7 +211,9 @@ Now let's see an example where the function does not run.
 ### Example 4 
 
 ```{r, error=TRUE}
-##using the "starwars" dataset from the dplyr package,
+
+#we will create a line of code using the boxplot_numeric_category function that will return an error message
+#using the "starwars" dataset from the dplyr package,
 #create a boxplot that shows the distribution of the name of starwars characters based on the sex of the characters.
 
 starwars %>% boxplot_numeric_category(sex, name)
@@ -269,3 +266,14 @@ test_that("Output Class Type of Boxplot Function Examples is ggplot", {
 
 As we can see, the function is working (is outputting a ggplot) based on these tests because the tests passed!
 
+# References 
+
+Akrun. 2020. Renaming multiple columns with dplyr rename(across(. Stack Overflow; [modified 2020 Oct 3; accessed 2021 Nov 2]. https://stackoverflow.com/questions/64188671/renaming-multiple-columns-with-dplyr-renameacross
+
+Cetinkaya-Rundel M, Wickham H, Page MJ, Dulhunty M, Henry L, Enevoldsen J, Spinielli E. 2020. Row-wise operations. Github; [modified 2020 Jun 15; accessed 2021 Oct 25]. https://dplyr.tidyverse.org/articles/rowwise.html
+
+Elferts D. 2016. Remove all of x axis labels in ggplot [duplicate]. Stack Overflow; [modified 2016 Jan 29; accessed 2021 Oct 25]. https://stackoverflow.com/questions/35090883/remove-all-of-x-axis-labels-in-ggplot
+
+Government of Canada. [date unknown]. Zooplankton database. Fisheries and Oceans Canada; [accessed 2021 Oct 9]. https://open.canada.ca/data/en/dataset/9447ecf8-a7f7-4904-8ab0-3c597c534c4b
+
+Joels. 2018. Converting dates (Year - Month - Day) to 3 separate columns (Year , Month , Day). Studio Community; [modified 2018 May 18; accessed 2021 Oct 19]. https://community.rstudio.com/t/converting-dates-year-month-day-to-3-separate-columns-year-month-day/8585/4
