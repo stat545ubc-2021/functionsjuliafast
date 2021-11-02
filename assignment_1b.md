@@ -157,20 +157,36 @@ numeric variable in each category of any categorical variable.
 ``` r
 #' @title Multiple Boxplot for a Numeric Variable across Categories 
 #' @description This function creates a multiple boxplot that shows the distribution of a numeric variable in different categories contained in a categorical variable. NA values will automatically be removed from the data, which will lead to the warning message "Removed n rows containing non-finite values (stat_boxplot)" with n being the number of NA rows removed.
-#' @params dataframe The dataframe that contains the variables that you would like to use to create the boxplot
-#' @params x The categorical variable that we want to plot a numerical variable across.
-#' @params y The numeric variable that we want to examine the distribution of across a categorical variable
+#' @params dataframe The dataframe that contains the variables that you would like to use to create the boxplot. The class of this parameter must be dataframe.
+#' @params x The categorical variable that we want to plot a numerical variable across. x must be a vector of class character or factor.
+#' @params y The numeric variable that we want to examine the distribution of across a categorical variable. y must be a vector of class double, integer, or numeric.
 #' @return A boxplot showing the distribution of y in each category contained in x
 #' 
-#' Creates a boxplot using the "CO2" dataset from the r "datasets" package that shows the distribution of CO2 concentration of grass plants in each treatment type (chilled or nonchilled):
+#' #Create a boxplot using the "CO2" dataset from the r "datasets" package that shows the distribution of CO2 concentration of grass plants in each treatment type (chilled or nonchilled):
 #' @examples boxplot_numeric_category(CO2, Treatment, conc)
-#' Creates a boxplot using the dplyr "starwars" dataset that shows the distribution of the height of starwars characters based on the sex of the characters:
+#' #Create a boxplot using the dplyr "starwars" dataset that shows the distribution of the height of starwars characters based on the sex of the characters:
 #' @examples starwars %>% boxplot_numeric_category(sex, height)
-#' Creates a boxplot using the dplyr "storms" dataset that shows the distribution of the wind speeds observed for the storms Caroline and Doris:
+#' # Create a boxplot using the dplyr "starwars" dataset that attempts to plot the distribution of the name of starwars characters based on the sex of the characters.Because the name variable is a character and not a numeric vector, the function will deliver an error message.
+#' @examples starwars %>% boxplot_numeric_category(sex, name)
+#' # Create a boxplot using the dplyr "storms" dataset that shows the distribution of the wind speeds observed for the storms Caroline and Doris:
 #' @examples boxplot_numeric_category((storms %>% filter(name == c("Amy", "Doris"))), name, wind)
 
 #create a function called "boxplot_numeric_category"
 boxplot_numeric_category <- function (dataframe, x, y) {
+  
+  #code modified from Kea Rutherford
+  
+  if(!is.data.frame(dataframe)) {
+    stop('You have entered an input that is not a dataframe. Please use a dataframe for the dataframe input')
+    }
+
+  if(!(is.character(eval(substitute(x), dataframe)) || is.factor(eval(substitute(x), dataframe)))) {
+    stop('You have entered a non-character or non-factor input. Please enter a character variable or factor variable for the x input')
+  }
+  
+  if(!(is.numeric(eval(substitute(y), dataframe)) || is.integer(eval(substitute(y), dataframe)) || is.double(eval(substitute(y), dataframe)))) {
+    stop('You have entered a non-numeric, non-integer, or non-double input. Please enter a variable of a numeric, integer, or double class for the y input')
+  }
   
   ggplot(dataframe, aes({{ x }}, {{ y }})) + 
   #specify a box plot, set the width of the boxes, and specify the transparency of the box plot
@@ -185,10 +201,12 @@ boxplot_numeric_category <- function (dataframe, x, y) {
 }
 
 # remove na https://stackoverflow.com/questions/17216358/eliminating-nas-from-a-ggplot
+
+# idea to include dataframe from Kea, Yulia directed me to her code and so is ||
 ```
 
 Now let’s test this function to see if it works by creating a boxplot
-that compares Copepod biomass pre and pst heat wave.
+that compares Copepod biomass pre and post heat wave.
 
 ``` r
 boxplot_cop_biomass <- boxplot_numeric_category(zooplankton_funct, `Time Period`, `Copepoda Proportion of Total Biomass`)
@@ -198,41 +216,18 @@ print(boxplot_cop_biomass)
 
 ![](assignment_1b_files/figure-gfm/unnamed-chunk-6-1.png)<!-- -->
 
--   expect equal two boxplots
--   expect error if one is not numeric
--   expect error if one is not variABLE
--   expect class is a boxplot
-
-# Exercise 2: Document your Function (20 points)
-
-In the same code chunk where you made your function, document the
-function using roxygen2 tags. Be sure to include:
-
-Title. Function description: In 1-2 brief sentences, describe what the
-function does. Document each argument with the @param tag, making sure
-to justify why you named the parameter as you did. (Justification for
-naming is not often needed, but we want to hear your reasoning.) What
-the function returns, using the @return tag.
-
-Before getting started, let’s also modify the region_name column in the
-zooplankton_biomass_mi3 (cleaned) dataset and convert this variable from
-a character object to a factor.
-
 ``` r
-#convert the region_name variable from a character object to a factor
-#below line of code from Schork [date unknown]
-#zooplankton_biomass_mi3$region_name <- as.factor(zooplankton_biomass_mi3$region_name)
+test_that("Testing boxplot functions", {
+  expect_error(boxplot_numeric_category(starwars, sex, name), "You have entered a non-numeric, non-integer, or non-double input. Please enter a variable of a numeric, integer, or double class for the y input")
+  expect_s3_class(boxplot_cop_biomass, "ggplot")
+  expect_silent(boxplot_numeric_category(starwars, sex, height))
+
+})
 ```
 
-params na.rm This command can be set equal to (=) TRUE to remove NA
-values or FALSE to leave NA values in.
+    ## Test passed 😸
 
-below line of code from
-<https://stackoverflow.com/questions/49943092/how-to-set-ggplot-x-label-equal-to-variable-name-during-lapply>
-
-get_name \<- deparse(substitute(y))
-
-xlab(label= get_name)
-
-possible sources  
-<https://subscription.packtpub.com/book/big_data_and_business_intelligence/9781783554553/1/ch01lvl1sec12/passing-parameter-values-to-titles-and-labels>
+-   expect equal two boxplots
+-   expect error if one is not numeric
+-   expect error if one is not variable
+-   expect class is a ggplot
