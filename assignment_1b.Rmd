@@ -6,11 +6,11 @@ output: github_document
 ---
 
 
-## Datset Background (Section Copied from Milestones 1-3 of the STAT545A Mini Data Analysis Project)
+## Datset Background (Section Copied from STAT545A Mini Data Analysis Project)
 
-The *zooplankton_biomass* dataset used for this project was acquired courtesy of Fisheries and Oceans Canada (DFO). I will be using this dataset for my MSc research project. It contains zooplankton biomass data by major taxa collected from 1980 to 2018 at a variety of stations in the NE Pacific and Canadian Arctic oceanic regions. Samples were collected both during the day and at night using a variety of sampling net types (Government of Canada [date unknown]).
+The *zooplankton_biomass* dataset used for this assignment was acquired courtesy of Fisheries and Oceans Canada (DFO). I will be using this dataset for my MSc research project. It contains zooplankton biomass data by major taxa collected from 1980 to 2018 at a variety of stations in the NE Pacific and Canadian Arctic oceanic regions. Samples were collected both during the day and at night using a variety of sampling net types (Government of Canada [date unknown]).
 
-# Install and Load Packages (Section Adapted from Milestones 1-3 of the STAT545A Mini Data Analysis Project)
+## Install and Load Packages
 
 **Install** `tidyverse`, `readr`, `roxygen2`, and `testthat` packages if you have not already done so:
 ```{r, message = FALSE}
@@ -30,6 +30,9 @@ The *zooplankton_biomass* dataset used for this project was acquired courtesy of
 ```
 
 **Load** the `tidyverse`, `testthat`, and `roxygen2` packages, as well as the `zooplankton dataset` being used for this project:
+
+*some of the below code from STAT545A Mini Data Analysis*
+
 ```{r, message = FALSE}
 
 #load the tidyverse package
@@ -45,10 +48,7 @@ zooplankton_biomass <- read_csv('IOS_zooplankton_1980_2018_as_biomass_major_taxa
 
 ```
 
-
-- overall making a function that will compare the proportion of total zooplankton biomass made up by each zooplankton taxa pre and post HW
-
-I want to use a cleaned up version of the zooplankton_biomass dataset that I created for the Mini Data Analysis Milestone 3 assignment from the STAT545A class.
+For this assignment, I'd like to use the function I will create to answer questions pertaining to the zooplankton_biomass dataset from DFO. I will use a cleaned up version of that I created for the Mini Data Analysis Milestone 3 assignment from the STAT545A class.
 ```{r}
 #create a subset of the zooplankton_biomass dataset called "zooplankton_biomass_cleaned"
 zooplankton_biomass_cleaned <- zooplankton_biomass %>% 
@@ -70,7 +70,7 @@ zooplankton_biomass_cleaned <- zooplankton_biomass %>%
 #view the cleaned up dataset
 print(zooplankton_biomass_cleaned)
 ```
-
+I want to further modify this cleaned dataset to work best with the function I plan to create:
 ```{r}
 #create a new dataset called "zooplankton_funct" from the cleaned version of the original dataset
 zooplankton_funct <- zooplankton_biomass_cleaned %>% 
@@ -91,12 +91,9 @@ zooplankton_funct <- zooplankton_biomass_cleaned %>%
 print(zooplankton_funct)
 
 ```
-# Exercise 1: Make a Function (25 points)
+# Exercises 1-3: Make a Function, Document the Function, Include Examples
 
-In this exercise, you’ll be making a function and fortifying it. The function need not be complicated. The function need not be “serious”, but shouldn’t be nonsense.
-
-I want to create a function that compares the proportion of total biomass made up by one of the zooplankton taxa pre and post heat wave. I will make this function general so that it can be used to compare any numeric variable in each category of any categorical variable. 
-
+I want to create a function that will allow me to compare the proportion of total biomass made up by one of the zooplankton taxa pre and post heat wave. I will make this function general so that it can be used to compare any numeric variable across each category of any categorical variable. 
 
 - named variable x and y because of what axis, the categorical variable names would be on x axis and numeric variables on y axis
 - people are used to an x and y variable when creating plots
@@ -118,23 +115,26 @@ I want to create a function that compares the proportion of total biomass made u
 #' # Create a boxplot using the dplyr "storms" dataset that shows the distribution of the wind speeds observed for the storms Caroline and Doris:
 #' boxplot_numeric_category((storms %>% filter(name == c("Amy", "Doris"))), name, wind)
 
-#create a function called "boxplot_numeric_category"
 boxplot_numeric_category <- function (dataframe, x, y) {
   
-  #code modified from Kea Rutherford
+calculations_x <- summarise(dataframe, is.character = is.character({{x}}) | is.factor({{x}}), class = class({{x}}))
+
+calculations_y <- summarise(dataframe, is.numeric = is.numeric({{y}}) | is.double({{y}}) | is.integer({{y}}), class = class({{y}}))
+  
   
   if(!is.data.frame(dataframe)) {
     stop('You have entered an input that is not a dataframe. Please use a dataframe for the dataframe input')
     }
 
-  if(!(is.character(eval(substitute(x), dataframe)) || is.factor(eval(substitute(x), dataframe)))) {
-    stop('You have entered a non-character or non-factor input. Please enter a character variable or factor variable for the x input')
+  if(!calculations_x$is.character) {
+    stop('You have entered a non-character or non-factor input. Please enter a character variable or factor variable for the x input', class(calculations_x$class))
   }
   
-  if(!(is.numeric(eval(substitute(y), dataframe)) || is.integer(eval(substitute(y), dataframe)) || is.double(eval(substitute(y), dataframe)))) {
-    stop('You have entered a non-numeric, non-integer, or non-double input. Please enter a variable of a numeric, integer, or double class for the y input')
+  if(!calculations_y$is.numeric) {
+    stop('You have entered a non-numeric or non-factor input. Please enter a character variable or factor variable for the x input', class(calculations_y$class))
   }
   
+
   ggplot(dataframe, aes({{ x }}, {{ y }})) + 
   geom_boxplot(aes(fill= {{ x }})) + 
     theme_linedraw() +
@@ -151,7 +151,7 @@ boxplot_numeric_category <- function (dataframe, x, y) {
 
 ```
 
-Now let's test this function to see if it works by creating a boxplot that compares Copepod biomass pre and post heat wave.
+Now let's run this function see if it will create a boxplot that compares Copepod biomass pre and post heat wave.
 ```{r}
 
 boxplot_cop_biomass <- boxplot_numeric_category(zooplankton_funct, `Time Period`, `Copepoda Proportion of Total Biomass`)
@@ -160,6 +160,11 @@ print(boxplot_cop_biomass)
 
 ```
 
+It appears to be working, but let's run some tests to be sure!
+
+# Exercise 4: Test the Function
+
+First, let's test to see if the three examples that have the right variable types run without an error message and if the one example that did not have all correct variable types gave an error message: 
 ```{r}
 
 test_that("Testing if Examples for Boxplot Function Work or Do Not Work as Expected", {
@@ -168,11 +173,45 @@ test_that("Testing if Examples for Boxplot Function Work or Do Not Work as Expec
   expect_error(boxplot_numeric_category(starwars, sex, name), "You have entered a non-numeric, non-integer, or non-double input. Please enter a variable of a numeric, integer, or double class for the y input")
   expect_silent(boxplot_numeric_category((storms %>% filter(name == c("Amy", "Doris"))), name, wind))
 })
-  
+```
+
+Let's test now to see if each of the examples that use the correct variable types in the boxplot function output a ggplot (this is what we would expect):
+```{r}
 test_that("Output Class Type of Boxplot Function Examples is ggplot", {
   expect_s3_class((boxplot_numeric_category(CO2, Treatment, conc)), "ggplot")
   expect_s3_class((starwars %>% boxplot_numeric_category(sex, height)), "ggplot")
   expect_s3_class((boxplot_numeric_category((storms %>% filter(name == c("Amy", "Doris"))), name, wind)), "ggplot")
   })
+
+```
+
+
+
+```{r}
+
+  
+  
+  
+  #code modified from Kea Rutherford
+  #calculations_x <- summarise(dataframe, is.character = is.character({{y}}) | is.factor({{x}}), class = class({{x}}))
+  
+  #calculations_y <- summarise(dataframe, is.numeric = is.numeric({{y}}), is.double = is.double({{y}}), is.integer = #is.integer({{y}}), class = class({{y}}))
+  
+  
+  #if(!is.data.frame(dataframe)) {
+    #stop('You have entered an input that is not a dataframe. Please use a dataframe for the dataframe input')
+    #}
+
+  #if(!calculations_x$is.character || !calculations_x$is.factor) {
+    #stop('You have entered a non-character or non-factor input. Please enter a character variable or factor variable for #the x input', class(calculations_x$class))
+  #}
+  
+  #if(!calculations_y$is.numeric || !calculations_y$is.integer || !calculations_y$is.double) {
+    #stop('You have entered a non-character or non-factor input. Please enter a character variable or factor variable for #the x input', class(calculations_y$class))
+ # }
+  
+  #if(!(is.numeric(eval(substitute(y), dataframe)) || is.integer(eval(substitute(y), dataframe)) || #is.double(eval(substitute(y), dataframe)))) {
+    #stop('You have entered a non-numeric, non-integer, or non-double input. Please enter a variable of a numeric, #integer, or double class for the y input')
+  #}
 
 ```
