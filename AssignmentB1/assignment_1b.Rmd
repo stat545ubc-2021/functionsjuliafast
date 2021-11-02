@@ -108,9 +108,9 @@ I want to create a function that will allow me to compare the proportion of tota
 
 boxplot_numeric_category <- function (dataframe, x, y) {
   
-calculations_x <- summarise(dataframe, is.character = is.character({{x}}) | is.factor({{x}}), class = class({{x}}))
+calculations_x <- summarise(dataframe, is.character = is.character({{ x }}) | is.factor({{ x }}), class = class({{ x }}))
 
-calculations_y <- summarise(dataframe, is.numeric = is.numeric({{y}}) | is.double({{y}}) | is.integer({{y}}), class = class({{y}}))
+calculations_y <- summarise(dataframe, is.numeric = is.numeric({{ y }}) | is.double({{ y }}) | is.integer({{ y }}), class = class({{ y }}))
   
   
   if(!is.data.frame(dataframe)) {

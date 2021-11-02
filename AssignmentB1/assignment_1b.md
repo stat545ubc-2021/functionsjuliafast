@@ -166,9 +166,9 @@ variable.
 
 boxplot_numeric_category <- function (dataframe, x, y) {
   
-calculations_x <- summarise(dataframe, is.character = is.character({{x}}) | is.factor({{x}}), class = class({{x}}))
+calculations_x <- summarise(dataframe, is.character = is.character({{ x }}) | is.factor({{ x }}), class = class({{ x }}))
 
-calculations_y <- summarise(dataframe, is.numeric = is.numeric({{y}}) | is.double({{y}}) | is.integer({{y}}), class = class({{y}}))
+calculations_y <- summarise(dataframe, is.numeric = is.numeric({{ y }}) | is.double({{ y }}) | is.integer({{ y }}), class = class({{ y }}))
   
   
   if(!is.data.frame(dataframe)) {
@@ -347,7 +347,7 @@ test_that("Testing if Examples for Boxplot Function Work or Do Not Work as Expec
 })
 ```
 
-    ## Test passed 🥇
+    ## Test passed 🥳
 
 As we can see, the function is working (giving error messages only when
 it should and running smoothly when it should) based on these tests
@@ -366,7 +366,7 @@ test_that("Output Class Type of Boxplot Function Examples is ggplot", {
   })
 ```
 
-    ## Test passed 🥳
+    ## Test passed 🎉
 
 As we can see, the function is working (is outputting a ggplot) based on
 these tests because the tests passed!
