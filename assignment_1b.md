@@ -189,11 +189,8 @@ boxplot_numeric_category <- function (dataframe, x, y) {
   }
   
   ggplot(dataframe, aes({{ x }}, {{ y }})) + 
-  #specify a box plot, set the width of the boxes, and specify the transparency of the box plot
   geom_boxplot(aes(fill= {{ x }})) + 
-    #change the theme of the plot
     theme_linedraw() +
-    #remove the x axis ticks and labels
     #below line of code from Elferts 2016
     theme(axis.text.x=element_blank(),
           axis.ticks.x=element_blank(),
@@ -225,14 +222,13 @@ test_that("Testing if Examples for Boxplot Function Work or Do Not Work as Expec
 })
 ```
 
-    ## Test passed 🥳
+    ## Test passed 😀
 
 ``` r
 test_that("Output Class Type of Boxplot Function Examples is ggplot", {
   expect_s3_class((boxplot_numeric_category(CO2, Treatment, conc)), "ggplot")
   expect_s3_class((starwars %>% boxplot_numeric_category(sex, height)), "ggplot")
   expect_s3_class((boxplot_numeric_category((storms %>% filter(name == c("Amy", "Doris"))), name, wind)), "ggplot")
-  expect_s3_class(boxplot_cop_biomass, "ggplot")
   })
 ```
 
