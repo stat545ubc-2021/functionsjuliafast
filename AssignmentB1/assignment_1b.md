@@ -185,6 +185,7 @@ calculations_y <- summarise(dataframe, is.numeric = is.numeric({{ y }}) | is.dou
   
 
   dataframe %>% 
+    #below line of code from Leon 2020
     drop_na({{x}}, {{y}}) %>% 
     ggplot(aes({{ x }}, {{ y }})) +
     geom_boxplot(aes(fill= {{ x }})) + 
@@ -344,7 +345,7 @@ test_that("Testing if Examples for Boxplot Function Work or Do Not Work as Expec
 })
 ```
 
-    ## Test passed 😀
+    ## Test passed 🥇
 
 As we can see, the function is working (giving error messages only when
 it should and running smoothly when it should) based on these tests
@@ -363,7 +364,7 @@ test_that("Output Class Type of Boxplot Function Examples is ggplot", {
   })
 ```
 
-    ## Test passed 😀
+    ## Test passed 🥇
 
 As we can see, the function is working (is outputting a ggplot) based on
 these tests because the tests passed!
@@ -388,6 +389,10 @@ and Oceans Canada; \[accessed 2021 Oct 9\].
 <https://open.canada.ca/data/en/dataset/9447ecf8-a7f7-4904-8ab0-3c597c534c4b>
 
 Joels. 2018. Converting dates (Year - Month - Day) to 3 separate columns
-(Year , Month , Day). Studio Community; \[modified 2018 May 18; accessed
-2021 Oct 19\].
+(Year , Month , Day). R Studio Community; \[modified 2018 May 18;
+accessed 2021 Oct 19\].
 <https://community.rstudio.com/t/converting-dates-year-month-day-to-3-separate-columns-year-month-day/8585/4>
+
+Leon. 2020. Removing NA from used column in ggplot. R Studio Community;
+\[modified 2020 Aug 16; accessed 2021 Nov 2\].
+<https://community.rstudio.com/t/removing-na-from-used-column-in-ggplot/76579>
