@@ -3,9 +3,9 @@ STAT545 Assignment B1
 Julia Fast
 01/11/2021
 
-## Datset Background (Section Copied from Milestones 1-3 of the STAT545A Mini Data Analysis Project)
+## Datset Background (Section Copied from STAT545A Mini Data Analysis Project)
 
-The *zooplankton_biomass* dataset used for this project was acquired
+The *zooplankton_biomass* dataset used for this assignment was acquired
 courtesy of Fisheries and Oceans Canada (DFO). I will be using this
 dataset for my MSc research project. It contains zooplankton biomass
 data by major taxa collected from 1980 to 2018 at a variety of stations
@@ -13,7 +13,7 @@ in the NE Pacific and Canadian Arctic oceanic regions. Samples were
 collected both during the day and at night using a variety of sampling
 net types (Government of Canada \[date unknown\]).
 
-# Install and Load Packages (Section Adapted from Milestones 1-3 of the STAT545A Mini Data Analysis Project)
+## Install and Load Packages
 
 **Install** `tidyverse`, `readr`, `roxygen2`, and `testthat` packages if
 you have not already done so:
@@ -35,6 +35,8 @@ you have not already done so:
 **Load** the `tidyverse`, `testthat`, and `roxygen2` packages, as well
 as the `zooplankton dataset` being used for this project:
 
+*some of the below code from STAT545A Mini Data Analysis*
+
 ``` r
 #load the tidyverse package
 #load the readr package (this package will allow the CSV file containing the project dataset to be read)
@@ -48,12 +50,10 @@ library(roxygen2)
 zooplankton_biomass <- read_csv('IOS_zooplankton_1980_2018_as_biomass_major_taxa_groups_EN.csv')
 ```
 
--   overall making a function that will compare the proportion of total
-    zooplankton biomass made up by each zooplankton taxa pre and post HW
-
-I want to use a cleaned up version of the zooplankton_biomass dataset
-that I created for the Mini Data Analysis Milestone 3 assignment from
-the STAT545A class.
+For this assignment, I’d like to use the function I will create to
+answer questions pertaining to the zooplankton_biomass dataset from DFO.
+I will use a cleaned up version of that I created for the Mini Data
+Analysis Milestone 3 assignment from the STAT545A class.
 
 ``` r
 #create a subset of the zooplankton_biomass dataset called "zooplankton_biomass_cleaned"
@@ -98,6 +98,9 @@ print(zooplankton_biomass_cleaned)
     ## #   Echinodermata <dbl>, Bivalva <dbl>, Cephalopoda <dbl>, Gastropoda <dbl>,
     ## #   Pteropoda <dbl>, Nemertea <dbl>, Phoronida <dbl>, Pisces <dbl>, …
 
+I want to further modify this cleaned dataset to work best with the
+function I plan to create:
+
 ``` r
 #create a new dataset called "zooplankton_funct" from the cleaned version of the original dataset
 zooplankton_funct <- zooplankton_biomass_cleaned %>% 
@@ -139,16 +142,13 @@ print(zooplankton_funct)
     ## #   Anomura Proportion of Total Biomass <dbl>,
     ## #   Brachyura Proportion of Total Biomass <dbl>, …
 
-# Exercise 1: Make a Function (25 points)
+# Exercises 1-3: Make a Function, Document the Function, Include Examples
 
-In this exercise, you’ll be making a function and fortifying it. The
-function need not be complicated. The function need not be “serious”,
-but shouldn’t be nonsense.
-
-I want to create a function that compares the proportion of total
-biomass made up by one of the zooplankton taxa pre and post heat wave. I
-will make this function general so that it can be used to compare any
-numeric variable in each category of any categorical variable.
+I want to create a function that will allow me to compare the proportion
+of total biomass made up by one of the zooplankton taxa pre and post
+heat wave. I will make this function general so that it can be used to
+compare any numeric variable across each category of any categorical
+variable.
 
 -   named variable x and y because of what axis, the categorical
     variable names would be on x axis and numeric variables on y axis
@@ -202,8 +202,8 @@ boxplot_numeric_category <- function (dataframe, x, y) {
 # idea to include dataframe from Kea, Yulia directed me to her code and so is ||
 ```
 
-Now let’s test this function to see if it works by creating a boxplot
-that compares Copepod biomass pre and post heat wave.
+Now let’s run this function see if it will create a boxplot that
+compares Copepod biomass pre and post heat wave.
 
 ``` r
 boxplot_cop_biomass <- boxplot_numeric_category(zooplankton_funct, `Time Period`, `Copepoda Proportion of Total Biomass`)
@@ -212,6 +212,14 @@ print(boxplot_cop_biomass)
 ```
 
 ![](assignment_1b_files/figure-gfm/unnamed-chunk-6-1.png)<!-- -->
+
+It appears to be working, but let’s run some tests to be sure!
+
+# Exercise 4: Test the Function
+
+First, let’s test to see if the three examples that have the right
+variable types run without an error message and if the one example that
+did not have all correct variable types gave an error message:
 
 ``` r
 test_that("Testing if Examples for Boxplot Function Work or Do Not Work as Expected", {
@@ -222,7 +230,11 @@ test_that("Testing if Examples for Boxplot Function Work or Do Not Work as Expec
 })
 ```
 
-    ## Test passed 😀
+    ## Test passed 🎊
+
+Let’s test now to see if each of the examples that use the correct
+variable types in the boxplot function output a ggplot (this is what we
+would expect):
 
 ``` r
 test_that("Output Class Type of Boxplot Function Examples is ggplot", {
@@ -232,4 +244,4 @@ test_that("Output Class Type of Boxplot Function Examples is ggplot", {
   })
 ```
 
-    ## Test passed 🎊
+    ## Test passed 🥳
