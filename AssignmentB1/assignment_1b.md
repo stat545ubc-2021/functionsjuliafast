@@ -347,7 +347,7 @@ test_that("Testing if Examples for Boxplot Function Work or Do Not Work as Expec
 })
 ```
 
-    ## Test passed 😸
+    ## Test passed 🌈
 
 As we can see, the function is working (giving error messages only when
 it should and running smoothly when it should) based on these tests
@@ -366,7 +366,7 @@ test_that("Output Class Type of Boxplot Function Examples is ggplot", {
   })
 ```
 
-    ## Test passed 🌈
+    ## Test passed 🎉
 
 As we can see, the function is working (is outputting a ggplot) based on
 these tests because the tests passed!
