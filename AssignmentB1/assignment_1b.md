@@ -184,8 +184,10 @@ calculations_y <- summarise(dataframe, is.numeric = is.numeric({{ y }}) | is.dou
   }
   
 
-  ggplot(dataframe, aes({{ x }}, {{ y }})) + 
-  geom_boxplot(aes(fill= {{ x }})) + 
+  dataframe %>% 
+    drop_na({{x}}, {{y}}) %>% 
+    ggplot(aes({{ x }}, {{ y }})) +
+    geom_boxplot(aes(fill= {{ x }})) + 
     theme_linedraw() +
     #below line of code from Elferts 2016
     theme(axis.text.x=element_blank(),
@@ -193,6 +195,7 @@ calculations_y <- summarise(dataframe, is.numeric = is.numeric({{ y }}) | is.dou
           axis.title.x=element_blank())
 }
 
+# drop na https://community.rstudio.com/t/removing-na-from-used-column-in-ggplot/76579
 # remove na https://stackoverflow.com/questions/17216358/eliminating-nas-from-a-ggplot
 
 # idea to include dataframe from Kea, Yulia directed me to her code
@@ -264,8 +267,6 @@ function works.
 #create a boxplot that shows the distribution of the height of starwars characters based on the sex of the characters
 starwars %>% boxplot_numeric_category(sex, height)
 ```
-
-    ## Warning: Removed 6 rows containing non-finite values (stat_boxplot).
 
 ![](assignment_1b_files/figure-gfm/unnamed-chunk-9-1.png)<!-- -->
 
@@ -347,7 +348,7 @@ test_that("Testing if Examples for Boxplot Function Work or Do Not Work as Expec
 })
 ```
 
-    ## Test passed 🥳
+    ## Test passed 😀
 
 As we can see, the function is working (giving error messages only when
 it should and running smoothly when it should) based on these tests
@@ -366,7 +367,7 @@ test_that("Output Class Type of Boxplot Function Examples is ggplot", {
   })
 ```
 
-    ## Test passed 🎉
+    ## Test passed 🎊
 
 As we can see, the function is working (is outputting a ggplot) based on
 these tests because the tests passed!
