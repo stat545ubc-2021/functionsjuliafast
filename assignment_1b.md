@@ -1,9 +1,9 @@
-Assignment 1B
+STAT545 Assignment B1
 ================
 Julia Fast
 01/11/2021
 
-## Datset Background (Copied from Milestones 1 and 2)
+## Datset Background (Section Copied from Milestones 1-3 of the STAT545A Mini Data Analysis Project)
 
 The *zooplankton_biomass* dataset used for this project was acquired
 courtesy of Fisheries and Oceans Canada (DFO). I will be using this
@@ -13,7 +13,7 @@ in the NE Pacific and Canadian Arctic oceanic regions. Samples were
 collected both during the day and at night using a variety of sampling
 net types (Government of Canada \[date unknown\]).
 
-# Install and Load Packages (Section taken from Milestone 2)
+# Install and Load Packages (Section Adapted from Milestones 1-3 of the STAT545A Mini Data Analysis Project)
 
 **Install** `tidyverse`, `readr`, `roxygen2`, and `testthat` packages if
 you have not already done so:
@@ -161,15 +161,15 @@ numeric variable in each category of any categorical variable.
 #' @params x The categorical variable that we want to plot a numerical variable across. x must be a vector of class character or factor.
 #' @params y The numeric variable that we want to examine the distribution of across a categorical variable. y must be a vector of class double, integer, or numeric.
 #' @return A boxplot showing the distribution of y in each category contained in x
-#' 
-#' #Create a boxplot using the "CO2" dataset from the r "datasets" package that shows the distribution of CO2 concentration of grass plants in each treatment type (chilled or nonchilled):
-#' @examples boxplot_numeric_category(CO2, Treatment, conc)
-#' #Create a boxplot using the dplyr "starwars" dataset that shows the distribution of the height of starwars characters based on the sex of the characters:
-#' @examples starwars %>% boxplot_numeric_category(sex, height)
+#' @examples 
+#' # Create a boxplot using the "CO2" dataset from the r "datasets" package that shows the distribution of CO2 concentration of grass plants in each treatment type (chilled or nonchilled):
+#' boxplot_numeric_category(CO2, Treatment, conc)
+#' # Create a boxplot using the dplyr "starwars" dataset that shows the distribution of the height of starwars characters based on the sex of the characters:
+#'starwars %>% boxplot_numeric_category(sex, height)
 #' # Create a boxplot using the dplyr "starwars" dataset that attempts to plot the distribution of the name of starwars characters based on the sex of the characters.Because the name variable is a character and not a numeric vector, the function will deliver an error message.
-#' @examples starwars %>% boxplot_numeric_category(sex, name)
+#' starwars %>% boxplot_numeric_category(sex, name)
 #' # Create a boxplot using the dplyr "storms" dataset that shows the distribution of the wind speeds observed for the storms Caroline and Doris:
-#' @examples boxplot_numeric_category((storms %>% filter(name == c("Amy", "Doris"))), name, wind)
+#' boxplot_numeric_category((storms %>% filter(name == c("Amy", "Doris"))), name, wind)
 
 #create a function called "boxplot_numeric_category"
 boxplot_numeric_category <- function (dataframe, x, y) {
@@ -217,17 +217,23 @@ print(boxplot_cop_biomass)
 ![](assignment_1b_files/figure-gfm/unnamed-chunk-6-1.png)<!-- -->
 
 ``` r
-test_that("Testing boxplot functions", {
+test_that("Testing if Examples for Boxplot Function Work or Do Not Work as Expected", {
+  expect_silent(boxplot_numeric_category(CO2, Treatment, conc))
+  expect_silent(starwars %>% boxplot_numeric_category(sex, height))
   expect_error(boxplot_numeric_category(starwars, sex, name), "You have entered a non-numeric, non-integer, or non-double input. Please enter a variable of a numeric, integer, or double class for the y input")
-  expect_s3_class(boxplot_cop_biomass, "ggplot")
-  expect_silent(boxplot_numeric_category(starwars, sex, height))
-
+  expect_silent(boxplot_numeric_category((storms %>% filter(name == c("Amy", "Doris"))), name, wind))
 })
 ```
 
-    ## Test passed 😸
+    ## Test passed 🥳
 
--   expect equal two boxplots
--   expect error if one is not numeric
--   expect error if one is not variable
--   expect class is a ggplot
+``` r
+test_that("Output Class Type of Boxplot Function Examples is ggplot", {
+  expect_s3_class((boxplot_numeric_category(CO2, Treatment, conc)), "ggplot")
+  expect_s3_class((starwars %>% boxplot_numeric_category(sex, height)), "ggplot")
+  expect_s3_class((boxplot_numeric_category((storms %>% filter(name == c("Amy", "Doris"))), name, wind)), "ggplot")
+  expect_s3_class(boxplot_cop_biomass, "ggplot")
+  })
+```
+
+    ## Test passed 🎊
