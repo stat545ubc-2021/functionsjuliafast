@@ -3,7 +3,12 @@ STAT545 Assignment B1
 Julia Fast
 01/11/2021
 
-## Datset Background (Section Copied from STAT545A Mini Data Analysis Project)
+*Note that some code and text below will overlap with code and text from
+the STAT545A Mini Data Analysis*
+
+## Datset Background
+
+*(Section Copied from STAT545A Mini Data Analysis Project)*
 
 The *zooplankton_biomass* dataset used for this assignment was acquired
 courtesy of Fisheries and Oceans Canada (DFO). I will be using this
@@ -35,14 +40,14 @@ you have not already done so:
 **Load** the `tidyverse`, `testthat`, and `roxygen2` packages, as well
 as the `zooplankton dataset` being used for this project:
 
-*some of the below code from STAT545A Mini Data Analysis*
-
 ``` r
-#load the tidyverse package
 #load the readr package (this package will allow the CSV file containing the project dataset to be read)
 library(readr) 
+#load the tidyverse package
 library(tidyverse)
+#load the testthat package
 library(testthat)
+#load the roxygen2 package
 library(roxygen2)
 
 #read the project dataset in RStudio, and save this dataset as a variable called "zooplankton_biomass"
@@ -142,7 +147,7 @@ print(zooplankton_funct)
     ## #   Anomura Proportion of Total Biomass <dbl>,
     ## #   Brachyura Proportion of Total Biomass <dbl>, …
 
-# Exercises 1-3: Make a Function, Document the Function, Include Examples
+# Exercises 1-2: Make a Function and Document the Function
 
 I want to create a function that will allow me to compare the proportion
 of total biomass made up by one of the zooplankton taxa pre and post
@@ -161,33 +166,27 @@ variable.
 #' @params x The categorical variable that we want to plot a numerical variable across. x must be a vector of class character or factor.
 #' @params y The numeric variable that we want to examine the distribution of across a categorical variable. y must be a vector of class double, integer, or numeric.
 #' @return A boxplot showing the distribution of y in each category contained in x
-#' @examples 
-#' # Create a boxplot using the "CO2" dataset from the r "datasets" package that shows the distribution of CO2 concentration of grass plants in each treatment type (chilled or nonchilled):
-#' boxplot_numeric_category(CO2, Treatment, conc)
-#' # Create a boxplot using the dplyr "starwars" dataset that shows the distribution of the height of starwars characters based on the sex of the characters:
-#'starwars %>% boxplot_numeric_category(sex, height)
-#' # Create a boxplot using the dplyr "starwars" dataset that attempts to plot the distribution of the name of starwars characters based on the sex of the characters.Because the name variable is a character and not a numeric vector, the function will deliver an error message.
-#' starwars %>% boxplot_numeric_category(sex, name)
-#' # Create a boxplot using the dplyr "storms" dataset that shows the distribution of the wind speeds observed for the storms Caroline and Doris:
-#' boxplot_numeric_category((storms %>% filter(name == c("Amy", "Doris"))), name, wind)
 
-#create a function called "boxplot_numeric_category"
 boxplot_numeric_category <- function (dataframe, x, y) {
   
-  #code modified from Kea Rutherford
+calculations_x <- summarise(dataframe, is.character = is.character({{x}}) | is.factor({{x}}), class = class({{x}}))
+
+calculations_y <- summarise(dataframe, is.numeric = is.numeric({{y}}) | is.double({{y}}) | is.integer({{y}}), class = class({{y}}))
+  
   
   if(!is.data.frame(dataframe)) {
     stop('You have entered an input that is not a dataframe. Please use a dataframe for the dataframe input')
     }
 
-  if(!(is.character(eval(substitute(x), dataframe)) || is.factor(eval(substitute(x), dataframe)))) {
-    stop('You have entered a non-character or non-factor input. Please enter a character variable or factor variable for the x input')
+  if(!calculations_x$is.character) {
+    stop('You have entered a non-character or non-factor input. Please enter a character or factor variable for the x input', class(calculations_x$class))
   }
   
-  if(!(is.numeric(eval(substitute(y), dataframe)) || is.integer(eval(substitute(y), dataframe)) || is.double(eval(substitute(y), dataframe)))) {
-    stop('You have entered a non-numeric, non-integer, or non-double input. Please enter a variable of a numeric, integer, or double class for the y input')
+  if(!calculations_y$is.numeric) {
+    stop('You have entered a non-numeric, non-integer, or non-double input. Please enter a variable of a numeric, integer, or double class for the y input', class(calculations_y$class))
   }
   
+
   ggplot(dataframe, aes({{ x }}, {{ y }})) + 
   geom_boxplot(aes(fill= {{ x }})) + 
     theme_linedraw() +
@@ -202,6 +201,39 @@ boxplot_numeric_category <- function (dataframe, x, y) {
 # idea to include dataframe from Kea, Yulia directed me to her code and so is ||
 ```
 
+# Exercise 3: Include Examples
+
+``` r
+#create a boxplot using the "CO2" dataset from the r "datasets" package that shows the distribution of CO2 concentration of grass plants in each treatment type (chilled or nonchilled)
+boxplot_numeric_category(CO2, Treatment, conc)
+```
+
+![](assignment_1b_files/figure-gfm/unnamed-chunk-6-1.png)<!-- -->
+
+``` r
+#create a boxplot using the dplyr "starwars" dataset that shows the distribution of the height of starwars characters based on the sex of the characters
+starwars %>% boxplot_numeric_category(sex, height)
+```
+
+    ## Warning: Removed 6 rows containing non-finite values (stat_boxplot).
+
+![](assignment_1b_files/figure-gfm/unnamed-chunk-6-2.png)<!-- -->
+
+``` r
+#create a boxplot using the dplyr "starwars" dataset that attempts to plot the distribution of the name of starwars characters based on the sex of the characters.
+#Because the name variable is a character and not a numeric vector, the function will deliver an error message.
+starwars %>% boxplot_numeric_category(sex, name)
+```
+
+    ## Error in boxplot_numeric_category(., sex, name): You have entered a non-numeric, non-integer, or non-double input. Please enter a variable of a numeric, integer, or double class for the y inputcharacter
+
+``` r
+#create a boxplot using the dplyr "storms" dataset that shows the distribution of the wind speeds observed for the storms Caroline and Doris
+boxplot_numeric_category((storms %>% filter(name == c("Amy", "Doris"))), name, wind)
+```
+
+![](assignment_1b_files/figure-gfm/unnamed-chunk-6-3.png)<!-- -->
+
 Now let’s run this function see if it will create a boxplot that
 compares Copepod biomass pre and post heat wave.
 
@@ -211,9 +243,9 @@ boxplot_cop_biomass <- boxplot_numeric_category(zooplankton_funct, `Time Period`
 print(boxplot_cop_biomass)
 ```
 
-![](assignment_1b_files/figure-gfm/unnamed-chunk-6-1.png)<!-- -->
+![](assignment_1b_files/figure-gfm/unnamed-chunk-7-1.png)<!-- -->
 
-It appears to be working, but let’s run some tests to be sure!
+The function appears to be working, but let’s run some tests to be sure!
 
 # Exercise 4: Test the Function
 
@@ -230,7 +262,7 @@ test_that("Testing if Examples for Boxplot Function Work or Do Not Work as Expec
 })
 ```
 
-    ## Test passed 🎊
+    ## Test passed 😀
 
 Let’s test now to see if each of the examples that use the correct
 variable types in the boxplot function output a ggplot (this is what we
@@ -244,4 +276,16 @@ test_that("Output Class Type of Boxplot Function Examples is ggplot", {
   })
 ```
 
-    ## Test passed 🥳
+    ## Test passed 🌈
+
+``` r
+#' @examples 
+#' # Create a boxplot using the "CO2" dataset from the r "datasets" package that shows the distribution of CO2 concentration of grass plants in each treatment type (chilled or nonchilled):
+#' boxplot_numeric_category(CO2, Treatment, conc)
+#' # Create a boxplot using the dplyr "starwars" dataset that shows the distribution of the height of starwars characters based on the sex of the characters:
+#'starwars %>% boxplot_numeric_category(sex, height)
+#' # Create a boxplot using the dplyr "starwars" dataset that attempts to plot the distribution of the name of starwars characters based on the sex of the characters.Because the name variable is a character and not a numeric vector, the function will deliver an error message.
+#' starwars %>% boxplot_numeric_category(sex, name)
+#' # Create a boxplot using the dplyr "storms" dataset that shows the distribution of the wind speeds observed for the storms Caroline and Doris:
+#' boxplot_numeric_category((storms %>% filter(name == c("Amy", "Doris"))), name, wind)
+```
