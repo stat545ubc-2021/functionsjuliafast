@@ -14,7 +14,7 @@ The *zooplankton_biomass* dataset used for this assignment was acquired courtesy
 
 ## Install and Load Packages
 
-**Install** `tidyverse`, `readr`, `roxygen2`, and `testthat` packages if you have not already done so:
+**Install** the `tidyverse`, `readr`, `roxygen2`, and `testthat` packages if you have not already done so:
 ```{r, message = FALSE}
 
 #install the tidyverse package:
@@ -45,12 +45,12 @@ library(testthat)
 library(roxygen2)
 
 #read the project dataset in RStudio, and save this dataset as a variable called "zooplankton_biomass"
-#the CSV file containing the project dataset is located in the Milestone2 folder of the project GitHub repository
+#the CSV file containing the project dataset is located in the AssignmentB1 folder of the project GitHub repository
 zooplankton_biomass <- read_csv('IOS_zooplankton_1980_2018_as_biomass_major_taxa_groups_EN.csv')
 
 ```
 
-For this assignment, I'd like to use the function I will create to answer questions pertaining to the zooplankton_biomass dataset from DFO. I will use a cleaned up version of that I created for the Mini Data Analysis Milestone 3 assignment from the STAT545A class (below code from STAT545A MDA Milestones 2-3).
+For this assignment, I'd like to use the function I will create to answer questions pertaining to the zooplankton_biomass dataset from DFO. I will use a cleaned up version of the zooplankton_biomass dataset that I created for the Mini Data Analysis Milestone 3 assignment from the STAT545A class (below code from STAT545A MDA Milestones 2-3).
 ```{r}
 #create a subset of the zooplankton_biomass dataset called "zooplankton_biomass_cleaned"
 zooplankton_biomass_cleaned <- zooplankton_biomass %>% 
@@ -84,10 +84,10 @@ zooplankton_funct <- zooplankton_biomass_cleaned %>%
   mutate(across(where(is.numeric), ~./total_biomass)) %>% 
   #remove the total biomass column
   select(-total_biomass) %>% 
-  #rename the time_period column to "Time Period"
+  #rename the time_period column "Time Period"
   rename("Time Period" = time_period) %>% 
-  #rename each zooplanlton taxa column to the taxa name followed by "Proportion of Total Biomass"
-  # below line of code adapted from akrun 2020 
+  #rename each zooplankton taxa column as the taxa name followed by "Proportion of Total Biomass"
+  #below line of code adapted from akrun 2020 
   rename_with(~str_c(., " Proportion of Total Biomass"), Polychaeta:Animalia)
   
 #view the new dataset
@@ -96,40 +96,40 @@ print(zooplankton_funct)
 ```
 # Exercises 1-2: Make a Function and Document the Function
 
-I want to create a function that will allow me to compare the proportion of total biomass made up by one of the zooplankton taxa pre and post heat wave. I will make this function general so that it can be used to compare any numeric variable across each category of any categorical variable. 
+I want to create a function that will allow me to compare the proportion of total biomass made up by one of the zooplankton taxa pre and post heat wave. I will make this function general so that it can be used to compare any numeric variable across each category of any categorical variable. This function will be called "boxplot_numeric_category".
 
 ```{r}
 
 #' @title Multiple Boxplot for a Numeric Variable across Categories 
-#' @description This function creates a multiple boxplot that shows the distribution of a numeric variable in each different category contained in a categorical variable. NA values will automatically be removed from the data, which will lead to the warning message: "Removed n rows containing non-finite values (stat_boxplot)" with n being the number of NA rows removed.
-#' @params dataframe The dataframe that contains the variables that you would like to use to create the boxplot. The class of this parameter must be dataframe. This argument was named dataframe because the variable that needs to be input here is a dataframe, so users will instantly know what type of variable to include for this argument.
-#' @params x The categorical variable that we want to plot a numerical variable across. x must be a vector of class character or factor. This parameter was named x because it is the variable that is plotted on the x axis, and most users would be used to "x" being used to represent the x axis variable, so this argument name would be familiar to users.
+#' @description This function creates a multiple boxplot that shows the distribution of a numeric variable in each different category contained in a categorical variable. This function will remove any NA values in the data prior to creation of the boxplot.
+#' @params dataframe The dataframe that contains the variables that you would like to use to create the boxplot. The class of this parameter must be dataframe. This argument was named dataframe because the variable that needs to be input here must have a dataframe class type, so users will instantly know what type of variable to include for this argument.
+#' @params x The categorical variable containing the categories that we want to plot the distribution of a numerical variable across. x must be a vector of class character or factor. This parameter was named x because it is the variable that is plotted on the x axis, and most users would be used to "x" being used to represent the x axis variable, so this argument name would be familiar to users.
 #' @params y The numeric variable that we want to examine the distribution of across a categorical variable. y must be a vector of class double, integer, or numeric. This parameter was named y because it is the variable that is plotted on the y axis, and most users would be used to "y" being used to represent the y axis variable, so this argument name would be familiar to users.
-#' @return A boxplot showing the distribution of the variable y in each category contained in the variable x.
+#' @return A single panel multiple boxplot showing the distribution of the variable y in each category contained in the variable x.
 
 boxplot_numeric_category <- function (dataframe, x, y) {
   
-calculations_x <- summarise(dataframe, is.character = is.character({{ x }}) | is.factor({{ x }}), class = class({{ x }}))
+classinfo_x <- summarise(dataframe, is.character = is.character({{ x }}) | is.factor({{ x }}), class = class({{ x }}))
 
-calculations_y <- summarise(dataframe, is.numeric = is.numeric({{ y }}) | is.double({{ y }}) | is.integer({{ y }}), class = class({{ y }}))
+classinfo_y <- summarise(dataframe, is.numeric = is.numeric({{ y }}) | is.double({{ y }}) | is.integer({{ y }}), class = class({{ y }}))
   
   
   if(!is.data.frame(dataframe)) {
     stop('You have entered an input that is not a dataframe. Please use a dataframe for the dataframe input. Class type of the variable you entered is: ', class(dataframe))
     }
 
-  if(!calculations_x$is.character) {
-    stop('You have entered a non-character or non-factor input. Please enter a character or factor variable for the x input. Class type of the variable you entered is: ', class(calculations_x$class))
+  if(!classinfo_x$is.character) {
+    stop('You have entered a non-character or non-factor input. Please enter a character or factor variable for the x input. Class type of the variable you entered is: ', class(classinfo_x$class))
   }
   
-  if(!calculations_y$is.numeric) {
-    stop('You have entered a non-numeric, non-integer, or non-double input. Please enter a variable of a numeric, integer, or double class for the y input. Class type of the variable you entered is: ', class(calculations_y$class))
+  if(!classinfo_y$is.numeric) {
+    stop('You have entered a non-numeric, non-integer, or non-double input. Please enter a variable of a numeric, integer, or double class for the y input. Class type of the variable you entered is: ', class(classinfo_y$class))
   }
   
 
   dataframe %>% 
     #below line of code from Leon 2020
-    drop_na({{x}}, {{y}}) %>% 
+    drop_na({{ x }}, {{ y }}) %>% 
     ggplot(aes({{ x }}, {{ y }})) +
     geom_boxplot(aes(fill= {{ x }})) + 
     theme_linedraw() +
@@ -156,19 +156,19 @@ library(datasets)
 
 ```
 
-First, let's look at a few examples of how the function works:
+First, let's look at a few examples of how the boxplot_numeric_category function works:
 
 ### Example 1
 
 ```{r}
 
 #using the "CO2" dataset from the r "datasets" package,
-#create a boxplot that shows the distribution of CO2 concentration of grass plants for each treatment type (chilled or nonchilled)
+#create a boxplot that shows the distribution of CO2 concentration of grass plants in each treatment type (chilled or nonchilled)
 boxplot_numeric_category(dataframe = CO2, x = Treatment, y = conc)
 
 ```
 
-As we can see, the boxplot_numeric_category we created works here. The variables that we input into the function are a dataframe (CO2) as the dataframe argument, a categorical variable (Treatment) as the x argument, and a numeric variable (conc) as the y argument. I have shown the classes of these variables below to illustrate this.
+As we can see, the boxplot_numeric_category function we created works here. The variables that we input into the function are a dataframe (CO2) as the dataframe argument, a categorical variable (Treatment) as the x argument, and a numeric variable (conc) as the y argument. I have shown the classes of these variables below to illustrate this.
 
 ```{r}
 #see that the class of the CO2 variable is a dataframe
@@ -200,12 +200,12 @@ The above example shows the use of the boxplot_numeric_category with piping to k
 ```{r}
 
 #using the "storms" dataset from the dplyr package,
-#create a boxplot that shows the distribution of the wind speeds observed for the storms Caroline and Doris
+#create a boxplot that shows the distribution of the wind speeds observed for each of the storms Caroline and Doris
 boxplot_numeric_category((storms %>% filter(name == c("Amy", "Doris"))), name, wind)
 
 ```
 
-The above example shows the use of a dplyr function (filter) nested within the dataframe parameter of the boxplot_numeric_category function. Because the filtered dataset created here is still a dataframe, and the x and y arguments inputted (name and wind) are categorical and integer variables respectively, the function works. 
+The above example shows the use of a dplyr function (filter) nested within the dataframe parameter of the boxplot_numeric_category function. Because the filtered dataset created here is still a dataframe class, and the x and y arguments inputted (name and wind) are categorical and numeric (specifically integer) variables respectively, the function works. 
 
 Now let's see an example where the function does not run.
 
@@ -215,9 +215,9 @@ Now let's see an example where the function does not run.
 
 #we will create a line of code using the boxplot_numeric_category function that will return an error message
 #using the "starwars" dataset from the dplyr package,
-#create a boxplot that shows the distribution of the name of starwars characters based on the sex of the characters.
+#create a boxplot that shows the distribution of the name of starwars characters based on the sex of the characters
 
-starwars %>% boxplot_numeric_category(sex, name)
+boxplot_numeric_category(starwars, sex, name)
 
 ```
 
@@ -225,10 +225,10 @@ As we can see, we get an error message when trying to run the above code. This i
 
 ### Example with Zooplankton Biomass Data
 
-Finally, let's use the boxplot_numeric_category function to create a boxplot that compares Copepod biomass pre and post heat wave, as this was something I was interested in from the STAT545A MDA Milestones.
+Finally, let's use the boxplot_numeric_category function to create a boxplot that compares the proportion of Copepoda (one zooplankton taxa) in total zooplankton biomass pre and post the recent 2014 marine heat wave, as this was something I was interested in from the STAT545A MDA Milestones.
 ```{r}
 
-#create a boxplot that compares Copepod biomass pre and post heat wave
+#create a boxplot that compares the proportion of Copepods in total biomass pre and post heat wave
 #save this boxplot as a new variable called "boxplot_cop_biomass"
 boxplot_cop_biomass <- boxplot_numeric_category(zooplankton_funct, `Time Period`, `Copepoda Proportion of Total Biomass`)
 
@@ -237,11 +237,13 @@ print(boxplot_cop_biomass)
 
 ```
 
+Again we have entered a dataframe class variable (zooplankton_funct) as the dataframe argument, a categorical variable (Time Period) as the x argument and a numeric variable (Copepoda Proportion of Total Biomass) as the y argument. Because the variables entered fit the parameters for their respective arguments (as specified in the boxplot_numeric_category function code), the function works.
+
 Based on the above examples, the function appears to be working, but let's run some tests to be sure!
 
 # Exercise 4: Test the Function
 
-First, let's test to see if Examples 1-3 above, which have the right variable types as inputs, run without an error message. Let's also test to see if Example 4, which did not have all correct variable class types, gave the error message specified in the boxplot_numeric_category function code: 
+First, let's test to see if Examples 1-3 above, which have the correct variable types as inputs, run without an error message. Let's also test to see if Example 4, which did not have all correct variable class types as inputs, gave the error message specified in the boxplot_numeric_category function code: 
 ```{r}
 
 test_that("Testing if Examples for Boxplot Function Work or Do Not Work as Expected", {
@@ -254,7 +256,7 @@ test_that("Testing if Examples for Boxplot Function Work or Do Not Work as Expec
 
 As we can see, the function is working (giving error messages only when it should and running smoothly when it should) based on these tests because the tests passed!
 
-Now let's test now to see if each of Examples 1-3 and the Zooplankton Biomass data example, which all use the correct variable class types in the boxplot function, output a ggplot:
+Now let's test now to see if each of Examples 1-3 and the example with zooplankton biomass data, which all use the correct variable class types in the boxplot function, output a ggplot:
 ```{r}
 test_that("Output Class Type of Boxplot Function Examples is ggplot", {
   expect_s3_class((boxplot_numeric_category(CO2, Treatment, conc)), "ggplot")
