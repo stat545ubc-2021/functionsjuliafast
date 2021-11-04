@@ -8,7 +8,7 @@ This is the repository for all files related to Assignments B1 and B2 for the ST
 
 This repository contains the .Rmd and .md files for STAT545B Assignment B1. It also contains an .Rproj file containing the Rstudio project for this assignment.
 
-Assignment B1 .md and .rmd files are located in the **AssignmentB1** folder. This folder also contains a folder with files related to the figured produced in the .md file, called "assignment_1b_files". The "assignment_1b_files" folder must be kept in the same location as the assignment_1b.md file for the figures to be viewed in the .md file.
+Assignment B1 .md and .rmd files are located in the **AssignmentB1** folder. This folder also contains a folder with files related to the figures produced in the .md file, called "assignment_1b_files". The "assignment_1b_files" folder must be kept in the same location as the assignment_1b.md file for the figures to be viewed in the .md file.
 
 This project uses zooplankton biomass data from Fisheries and Oceans Canada. This repository contains the .csv raw dataset downloaded from the [Government of Canada website](https://open.canada.ca/data/en/dataset/9447ecf8-a7f7-4904-8ab0-3c597c534c4b). This dataset can be found in the **AssignmentB1** folder. 
 
