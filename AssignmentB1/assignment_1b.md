@@ -349,14 +349,17 @@ boxplot_numeric_category function code:
 
 ``` r
 test_that("Testing if Examples for Boxplot Function Work or Do Not Work as Expected", {
-  expect_silent(boxplot_numeric_category(CO2, Treatment, conc))
+  #test to see if examples 1 and 2 (above) run without an error message
+  expect_silent(boxplot_numeric_category(dataframe = CO2, x = Treatment, y = conc))
   expect_silent(starwars %>% boxplot_numeric_category(sex, height))
-  expect_error(boxplot_numeric_category(starwars, sex, name), "You have entered a non-numeric, non-integer, or non-double input. Please enter a variable of a numeric, integer, or double class for the y input. Class type of the variable you entered is: ")
+  #test to see if example 3 (above) run without an error message
   expect_silent(boxplot_numeric_category((storms %>% filter(name == c("Amy", "Doris"))), name, wind))
+   #test to see if example 4 (above) runs with the correct error message specified in the boxplot_numeric_category function code
+  expect_error(boxplot_numeric_category(starwars, sex, name), "You have entered a non-numeric, non-integer, or non-double input. Please enter a variable of a numeric, integer, or double class for the y input. Class type of the variable you entered is: ")
 })
 ```
 
-    ## Test passed 😀
+    ## Test passed 🎊
 
 As we can see, the function is working (giving error messages only when
 it should and running smoothly when it should) based on these tests
@@ -368,14 +371,15 @@ in the boxplot function, output a ggplot:
 
 ``` r
 test_that("Output Class Type of Boxplot Function Examples is ggplot", {
-  expect_s3_class((boxplot_numeric_category(CO2, Treatment, conc)), "ggplot")
+  #test to see if examples 1-3 and the example with zooplankton biomass data (above) produce a ggplot output as expected
+  expect_s3_class((boxplot_numeric_category(dataframe = CO2, x = Treatment, y = conc)), "ggplot")
   expect_s3_class((starwars %>% boxplot_numeric_category(sex, height)), "ggplot")
   expect_s3_class((boxplot_numeric_category((storms %>% filter(name == c("Amy", "Doris"))), name, wind)), "ggplot")
   expect_s3_class(boxplot_cop_biomass, "ggplot")
   })
 ```
 
-    ## Test passed 😀
+    ## Test passed 🎉
 
 As we can see, the function is working (is outputting a ggplot) based on
 these tests because the tests passed!
