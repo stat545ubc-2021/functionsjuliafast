@@ -1,4 +1,4 @@
-*This README file has in some cases been copied or adapted from the STAT545A Mini Data Analysis Project and from the STAT 545 project instructions.*
+*This README file has in some parts been copied or adapted from the STAT545A Mini Data Analysis Project and from the STAT 545 project instructions.*
 
 # Project Overview 
 
