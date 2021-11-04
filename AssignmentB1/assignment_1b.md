@@ -267,12 +267,12 @@ starwars %>% boxplot_numeric_category(sex, height)
 
 ![](assignment_1b_files/figure-gfm/unnamed-chunk-9-1.png)<!-- -->
 
-The above example shows the use of the boxplot_numeric_category with
-piping to keep the code orgnaized. Once again, the variable inputted as
-the dataframe argument (starwars) is a dataframe, the variable inputted
-as the x argument (sex) is a categorical variable and the variable
-inputted as the y argument (height) is a numeric variable (specifically
-an integer class), so the function works.
+The above example shows the use of the boxplot_numeric_category function
+with piping to keep the code organized. Once again, the variable
+inputted as the dataframe argument (starwars) is a dataframe, the
+variable inputted as the x argument (sex) is a categorical variable and
+the variable inputted as the y argument (height) is a numeric variable
+(specifically an integer class), so the function works.
 
 ### Example 3
 
@@ -359,7 +359,7 @@ test_that("Testing if Examples for Boxplot Function Work or Do Not Work as Expec
 })
 ```
 
-    ## Test passed 🥇
+    ## Test passed 🌈
 
 As we can see, the function is working (giving error messages only when
 it should and running smoothly when it should) based on these tests
@@ -379,7 +379,7 @@ test_that("Output Class Type of Boxplot Function Examples is ggplot", {
   })
 ```
 
-    ## Test passed 😸
+    ## Test passed 🌈
 
 As we can see, the function is working (is outputting a ggplot) based on
 these tests because the tests passed!

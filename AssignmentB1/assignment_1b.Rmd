@@ -194,7 +194,7 @@ starwars %>% boxplot_numeric_category(sex, height)
 
 ```
 
-The above example shows the use of the boxplot_numeric_category with piping to keep the code orgnaized. Once again, the variable inputted as the dataframe argument (starwars) is a dataframe, the variable inputted as the x argument (sex) is a categorical variable and the variable inputted as the y argument (height) is a numeric variable (specifically an integer class), so the function works.
+The above example shows the use of the boxplot_numeric_category function with piping to keep the code organized. Once again, the variable inputted as the dataframe argument (starwars) is a dataframe, the variable inputted as the x argument (sex) is a categorical variable and the variable inputted as the y argument (height) is a numeric variable (specifically an integer class), so the function works.
 
 ### Example 3
 ```{r}
